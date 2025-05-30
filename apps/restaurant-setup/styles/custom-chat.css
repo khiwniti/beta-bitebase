@@ -1,0 +1,186 @@
+/* Custom styling for the CopilotSidebar chat UI */
+
+/* Main chat container */
+.copilotKitSidebar {
+  --copilot-kit-primary-color: #10b981 !important;
+  --copilot-kit-primary-color-light: #34d399 !important;
+  --copilot-kit-primary-color-dark: #059669 !important;
+  --copilot-kit-primary-color-darker: #047857 !important;
+  --copilot-kit-primary-color-darkest: #065f46 !important;
+  --copilot-kit-primary-color-lightest: #ecfdf5 !important;
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+/* Chat header */
+.copilotKitSidebarHeader {
+  background: linear-gradient(to right, #10b981, #059669) !important;
+  padding: 1rem !important;
+  border-bottom: none !important;
+}
+
+.copilotKitSidebarHeader h3 {
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+  background: linear-gradient(to right, #ffffff, #d1fae5) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Chat messages container */
+.copilotKitSidebarContent {
+  background-color: #111827 !important;
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(5, 150, 105, 0.05) 0%, transparent 50%) !important;
+  padding: 1rem !important;
+}
+
+/* User message */
+.copilotKitSidebarUserMessage {
+  background: linear-gradient(to right, #10b981, #34d399) !important;
+  border-radius: 16px 16px 0 16px !important;
+  padding: 0.75rem 1rem !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  animation: slide-in-right 0.3s ease-out !important;
+}
+
+/* AI message */
+.copilotKitSidebarAIMessage {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px 16px 16px 0 !important;
+  padding: 0.75rem 1rem !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  animation: slide-in-left 0.3s ease-out !important;
+}
+
+/* Input area */
+.copilotKitSidebarInputContainer {
+  background-color: #1f2937 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 1rem !important;
+}
+
+.copilotKitSidebarTextarea {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  color: white !important;
+  transition: all 0.2s ease !important;
+}
+
+.copilotKitSidebarTextarea:focus {
+  border-color: var(--copilot-kit-primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Send button */
+.copilotKitSidebarSendButton {
+  background: linear-gradient(to right, #10b981, #34d399) !important;
+  border-radius: 12px !important;
+  padding: 0.5rem !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.copilotKitSidebarSendButton:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.copilotKitSidebarSendButton:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Suggestions */
+.copilotKitSidebarSuggestion {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 0.5rem 1rem !important;
+  margin-bottom: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.copilotKitSidebarSuggestion:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Typing indicator */
+.copilotKitSidebarTypingIndicator {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0.5rem 1rem !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 16px !important;
+  width: fit-content !important;
+  margin-bottom: 1rem !important;
+}
+
+.copilotKitSidebarTypingIndicator span {
+  width: 8px !important;
+  height: 8px !important;
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+  margin: 0 2px !important;
+}
+
+.copilotKitSidebarTypingIndicator span:nth-child(1) {
+  animation: bounce 1s infinite 0.2s !important;
+}
+
+.copilotKitSidebarTypingIndicator span:nth-child(2) {
+  animation: bounce 1s infinite 0.4s !important;
+}
+
+.copilotKitSidebarTypingIndicator span:nth-child(3) {
+  animation: bounce 1s infinite 0.6s !important;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}

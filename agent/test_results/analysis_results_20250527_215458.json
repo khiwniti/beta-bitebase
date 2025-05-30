@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "latitude": 13.7466,
+    "longitude": 100.5393,
+    "radius_km": 1.0,
+    "platforms": null,
+    "restaurant_count": 0,
+    "timestamp": "2025-05-27T21:54:58.693559"
+  },
+  "basic_analysis": {
+    "restaurant_count": 0,
+    "platform_distribution": {},
+    "average_rating": 0,
+    "price_level_distribution": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0
+    },
+    "top_cuisines": {}
+  },
+  "market_analysis": {
+    "rating_distribution": {
+      "0-2.5": 0,
+      "2.5-3.5": 0,
+      "3.5-4.5": 0,
+      "4.5-5": 0
+    },
+    "price_distribution": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0
+    },
+    "cuisine_distribution": {},
+    "market_saturation": 0.0,
+    "total_restaurants": 0
+  },
+  "competitor_analysis": {
+    "top_rated_restaurants": [],
+    "most_reviewed_restaurants": [],
+    "cross_platform_presence": {},
+    "price_rating_correlation": {}
+  },
+  "location_analysis": {
+    "distance_distribution": {
+      "0-0.5km": 0,
+      "0.5-1km": 0,
+      "1-2km": 0,
+      "2-3km": 0,
+      "3km+": 0
+    },
+    "average_rating_by_distance": {
+      "0-0.5km": 0,
+      "0.5-1km": 0,
+      "1-2km": 0,
+      "2-3km": 0,
+      "3km+": 0
+    },
+    "restaurant_clusters": [],
+    "cuisine_competitors": {}
+  }
+}

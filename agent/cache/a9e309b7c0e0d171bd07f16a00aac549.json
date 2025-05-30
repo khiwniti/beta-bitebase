@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-05-27T21:44:41.901067",
+  "url": "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+  "params": {
+    "location": "13.7466,100.5393",
+    "radius": 1000,
+    "type": "restaurant",
+    "key": "AIzaSyBy3b3aYUEE9gh23Fpheashdp9bXwQERg8AIzaSyBy3b3aYUEE9gh23Fpheashdp9bXwQERg8"
+  },
+  "data": {
+    "error_message": "The provided API key is invalid.",
+    "html_attributions": [],
+    "results": [],
+    "status": "REQUEST_DENIED"
+  }
+}
