@@ -19,12 +19,14 @@ vercel --prod
 2. **Sign in** with GitHub
 3. **Click**: "New Project"
 4. **Import**: `https://github.com/khiwniti/beta-bitebase`
-5. **Configure**:
-   - Framework: Next.js (auto-detected)
-   - Root Directory: `apps/frontend`
-   - Build Command: `npm run build`
-   - Output Directory: `.next`
+5. **Vercel will auto-detect the configuration from vercel.json**
 6. **Click**: "Deploy"
+
+**Note**: The `vercel.json` file is now fixed and will automatically configure:
+- Build Command: `cd apps/frontend && npm run build`
+- Output Directory: `apps/frontend/.next`
+- Framework: Next.js
+- Environment Variables: Pre-configured
 
 ## 🎯 Backend Deployment (Render)
 

@@ -1,34 +1,13 @@
 {
-  "version": 2,
-  "name": "bitebase-frontend",
-  "builds": [
-    {
-      "src": "apps/frontend/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": ".next"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "apps/frontend/$1"
-    }
-  ],
+  "buildCommand": "cd apps/frontend && npm run build",
+  "outputDirectory": "apps/frontend/.next",
+  "installCommand": "cd apps/frontend && npm install",
+  "framework": "nextjs",
   "env": {
     "NEXT_PUBLIC_API_URL": "https://bitebase-backend-api.onrender.com",
     "NEXT_PUBLIC_STRAPI_URL": "https://bitebase-strapi-cms.onrender.com",
     "NEXT_PUBLIC_AGENT_API_URL": "https://bitebase-ai-gateway.onrender.com",
     "NEXT_PUBLIC_SITE_URL": "https://beta.bitebase.app"
-  },
-  "build": {
-    "env": {
-      "NEXT_PUBLIC_API_URL": "https://bitebase-backend-api.onrender.com",
-      "NEXT_PUBLIC_STRAPI_URL": "https://bitebase-strapi-cms.onrender.com",
-      "NEXT_PUBLIC_AGENT_API_URL": "https://bitebase-ai-gateway.onrender.com",
-      "NEXT_PUBLIC_SITE_URL": "https://beta.bitebase.app"
-    }
   },
   "headers": [
     {
