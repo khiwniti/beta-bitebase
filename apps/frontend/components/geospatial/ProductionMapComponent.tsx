@@ -97,7 +97,7 @@ export default function ProductionMapComponent({
     
     try {
       // Try our AI agents worker first (has restaurant data)
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://bitebase-ai-agents-production.bitebase.workers.dev'
+      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'http://localhost:8080'
       
       const response = await fetch(`${aiAgentsUrl}/api/restaurants?latitude=${lat}&longitude=${lng}&radius=${radius}`)
       
@@ -106,7 +106,7 @@ export default function ProductionMapComponent({
         setRestaurants(data.restaurants || [])
       } else {
         // Fallback to backend API
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bitebase-backend-api-production.bitebase.workers.dev'
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
         const backendResponse = await fetch(`${backendUrl}/api/restaurants?latitude=${lat}&longitude=${lng}&radius=${radius}`)
         
         if (backendResponse.ok) {

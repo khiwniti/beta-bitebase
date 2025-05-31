@@ -9,7 +9,7 @@ import { RestaurantMarker } from "../../components/geospatial/RestaurantMarker"
 import { AnalysisOverlay } from "../../components/geospatial/AnalysisOverlay"
 import { DemographicLayer } from "../../components/geospatial/DemographicLayer"
 import { MapPin, BarChart3, Users, DollarSign, TrendingUp, Filter, Download, RefreshCw, Eye, Target, Star, Clock } from "lucide-react"
-import { DashboardLayout } from "../../components/layout/DashboardLayout"
+
 import { MetricCard, ChartCard, InsightCard, DashboardSection } from "../../components/dashboard/DashboardGrid"
 import { DataTable } from "../../components/ui/data-table"
 import { ChartContainer, SimpleLineChart, SimpleBarChart } from "../../components/ui/chart-container"
@@ -53,7 +53,7 @@ export default function MarketAnalysisPage() {
     setError(null)
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bitebase-backend-api-production.bitebase.workers.dev'
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
       const response = await fetch(`${backendUrl}/api/restaurants?latitude=${lat}&longitude=${lng}&radius=5000`)
 
       if (response.ok) {
@@ -83,7 +83,7 @@ export default function MarketAnalysisPage() {
   // Fetch demographics data from AI agent
   const fetchDemographics = React.useCallback(async (location: string) => {
     try {
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://bitebase-ai-agents-production.bitebase.workers.dev'
+      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'http://localhost:8080'
       const response = await fetch(`${aiAgentsUrl}/research`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,27 +114,18 @@ export default function MarketAnalysisPage() {
   const [showDemographics, setShowDemographics] = React.useState(false)
 
   return (
-    <DashboardLayout>
-      <div className="space-y-8">
-        {/* Page Header */}
-        <DashboardSection
-          title="Market Analysis"
-          description="Comprehensive geospatial analysis for restaurant market research"
-          actions={
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => console.log('Save analysis')}>
-                <Download className="w-4 h-4 mr-2" />
-                Save Analysis
-              </Button>
-              <Button onClick={() => console.log('Generate report')}>
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Generate Report
-              </Button>
-            </div>
-          }
-        >
-          <div></div>
-        </DashboardSection>
+    <div className="space-y-8">
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => console.log('Save analysis')}>
+            <Download className="w-4 h-4 mr-2" />
+            Save Analysis
+          </Button>
+          <Button onClick={() => console.log('Generate report')}>
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Generate Report
+          </Button>
+        </div>
 
         {/* Analysis Controls */}
         <ChartCard
@@ -504,6 +495,5 @@ export default function MarketAnalysisPage() {
           </div>
         </ChartCard>
       </div>
-    </DashboardLayout>
   )
 }

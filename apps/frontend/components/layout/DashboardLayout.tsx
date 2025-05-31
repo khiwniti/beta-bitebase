@@ -48,6 +48,8 @@ import {
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { useAuth } from '../../contexts/AuthContext'
 import BiteBaseLogo from '../BiteBaseLogo'
+import { WebTour, useTour } from '../tour/WebTour'
+import { TourTrigger } from '../tour/TourTrigger'
 
 // Enhanced navigation structure with better organization
 const navigation = [
@@ -187,6 +189,9 @@ export function DashboardLayout({
   const pathname = usePathname()
   const { user, logout } = useAuth()
   
+  // Tour state management
+  const { isTourOpen, isFirstTimeUser, startTour, closeTour, completeTour } = useTour()
+  
   // Layout state
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -297,6 +302,13 @@ export function DashboardLayout({
 
   return (
     <div className={`h-screen flex overflow-hidden ${darkMode ? 'dark' : ''} ${fullscreen ? 'fixed inset-0 z-50' : ''}`}>
+      {/* Tour integration with proper props */}
+      <WebTour 
+        isOpen={isTourOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+        isFirstTimeUser={isFirstTimeUser}
+      />
       {/* Sidebar */}
       {showSidebar && (
         <div 
@@ -703,6 +715,8 @@ export function DashboardLayout({
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+
     </div>
   )
 }

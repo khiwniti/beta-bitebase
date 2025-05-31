@@ -6,12 +6,10 @@ import { usePathname } from 'next/navigation'
 import { 
   Bell, 
   Search, 
-  ChevronDown, 
   Menu, 
   HelpCircle,
   MessageSquare,
-  Calendar,
-  User
+  Calendar
 } from 'lucide-react'
 import BiteBaseLogo from '../BiteBaseLogo'
 import { Button } from "@bitebase/ui"
@@ -22,10 +20,9 @@ interface HeaderProps {
   restaurantName?: string
 }
 
-export function Header({ onOpenSidebar, userName = 'Restaurant Manager', restaurantName = 'Your Restaurant' }: HeaderProps) {
+export function Header({ onOpenSidebar, userName = 'Maria Rodriguez', restaurantName = 'Bella Vista Bistro' }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false)
   const pathname = usePathname()
-  const [showUserMenu, setShowUserMenu] = useState(false)
   
   // Check if page is dashboard or analytics to show specific header actions
   const isAnalyticsPage = pathname?.includes('/market-analysis') || pathname?.includes('/place')
@@ -131,81 +128,7 @@ export function Header({ onOpenSidebar, userName = 'Restaurant Manager', restaur
             </div>
           )}
           
-          {/* User profile dropdown */}
-          <div className="relative ml-1">
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200"
-              aria-label="User menu"
-              aria-expanded={showUserMenu}
-            >
-              <div className="relative">
-                <div className="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-700 dark:text-primary-300 font-medium">
-                  {userName.charAt(0).toUpperCase()}
-                </div>
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></span>
-              </div>
-              <span className="hidden lg:inline-block font-medium text-sm">{userName}</span>
-              <ChevronDown className="h-4 w-4 text-gray-400 hidden lg:inline-block" />
-            </button>
-            
-            {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg z-50 py-2 animate-fadeInUp origin-top-right">
-                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-                  <p className="font-medium text-sm text-gray-900 dark:text-white">{userName}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{restaurantName}</p>
-      </div>
 
-                <div className="py-2">
-                  <Link
-                    href="/settings/profile" 
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <User className="w-4 h-4 mr-3 text-gray-400 dark:text-gray-500" />
-                    Your Profile
-                  </Link>
-                  <Link
-                    href="/settings/restaurant" 
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <svg className="w-4 h-4 mr-3 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M22 12V8C22 6.9 21.1 6 20 6H4C2.9 6 2 6.9 2 8V16C2 17.1 2.9 18 4 18H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12 10H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      <path d="M9 10H10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      <path d="M9 14H9.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      <circle cx="17" cy="16" r="3" stroke="currentColor" strokeWidth="2" />
-                      <path d="M22 21L19 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                    Restaurant Settings
-                  </Link>
-                  <Link
-                    href="/subscription"
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <svg className="w-4 h-4 mr-3 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M21 4H3C1.89543 4 1 4.89543 1 6V18C1 19.1046 1.89543 20 3 20H21C22.1046 20 23 19.1046 23 18V6C23 4.89543 22.1046 4 21 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M1 10H23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Subscription & Billing
-                  </Link>
-                </div>
-                
-                <div className="py-2 border-t border-gray-100 dark:border-gray-800">
-                  <Link
-                    href="/auth/signout" 
-                    className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <svg className="w-4 h-4 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M16 17L21 12L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Sign Out
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </header>

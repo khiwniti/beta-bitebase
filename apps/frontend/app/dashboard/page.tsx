@@ -22,7 +22,7 @@ import {
   Calendar
 } from "lucide-react"
 import { useAuth } from "../../contexts/AuthContext"
-import DashboardLayout from "../../components/layout/DashboardLayout"
+
 import { 
   DashboardGrid, 
   DashboardSection, 
@@ -34,49 +34,49 @@ import {
 import { ChartContainer, SimpleLineChart, SimpleBarChart } from "../../components/ui/chart-container"
 import { tourUtils } from "../../utils/tourUtils"
 
-// Placeholder data structure - will be replaced with real API data
-const placeholderMetrics = {
+// Realistic data for Bella Vista Bistro - Mediterranean restaurant in Bangkok
+const bellaVistaMetrics = {
   revenue: { 
-    value: "$12,450", 
-    change: { value: 8.2, period: 'vs last month', trend: 'up' as const }
+    value: "฿185,400", 
+    change: { value: 12.3, period: 'vs last month', trend: 'up' as const }
   },
   customers: { 
-    value: "1,234", 
-    change: { value: 12.5, period: 'vs last month', trend: 'up' as const }
+    value: "892", 
+    change: { value: 8.7, period: 'vs last month', trend: 'up' as const }
   },
   avgOrder: { 
-    value: "$45.60", 
-    change: { value: 3.1, period: 'vs last month', trend: 'up' as const }
+    value: "฿680", 
+    change: { value: 5.2, period: 'vs last month', trend: 'up' as const }
   },
   satisfaction: { 
-    value: "4.8", 
-    change: { value: 0.2, period: 'vs last month', trend: 'up' as const }
+    value: "4.6", 
+    change: { value: 0.1, period: 'vs last month', trend: 'up' as const }
   },
   footTraffic: { 
-    value: "2,456", 
-    change: { value: 15.3, period: 'vs yesterday', trend: 'up' as const }
+    value: "1,847", 
+    change: { value: 18.5, period: 'vs yesterday', trend: 'up' as const }
   },
   conversionRate: { 
-    value: "3.2%", 
-    change: { value: 0.8, period: 'vs last week', trend: 'up' as const }
+    value: "48.3%", 
+    change: { value: 2.1, period: 'vs last week', trend: 'up' as const }
   },
   marketShare: { 
-    value: "12.5%", 
-    change: { value: 1.2, period: 'vs last quarter', trend: 'up' as const }
+    value: "8.7%", 
+    change: { value: 0.9, period: 'vs last quarter', trend: 'up' as const }
   },
   competitorGap: { 
-    value: "8.3%", 
-    change: { value: -0.5, period: 'vs last quarter', trend: 'down' as const }
+    value: "15.2%", 
+    change: { value: -2.1, period: 'vs last quarter', trend: 'down' as const }
   }
 }
 
-// Mock data for insights
-const mockInsights = [
+// AI-generated insights for Bella Vista Bistro
+const bellaVistaInsights = [
   {
     id: 1,
     type: 'opportunity' as const,
-    title: 'Peak Hour Optimization',
-    description: 'Lunch rush shows 23% higher demand than capacity',
+    title: 'Weekend Dinner Rush Expansion',
+    description: 'Friday-Saturday 7-9pm shows 35% higher demand than seating capacity',
     impact: 'High' as const,
     action: 'Optimize staffing',
     priority: 1,
@@ -85,8 +85,8 @@ const mockInsights = [
   {
     id: 2,
     type: 'warning' as const,
-    title: 'Competitor Price Drop',
-    description: 'Main competitor reduced prices by 15%',
+    title: 'New Italian Competitor Nearby',
+    description: 'Nonna\'s Kitchen opened 200m away with 20% lower prices',
     impact: 'Medium' as const,
     action: 'Review pricing',
     priority: 2,
@@ -95,8 +95,8 @@ const mockInsights = [
   {
     id: 3,
     type: 'info' as const,
-    title: 'Menu Performance',
-    description: 'Top 3 items generate 60% of revenue',
+    title: 'Signature Pasta Performance',
+    description: 'Seafood Linguine and Truffle Risotto drive 45% of revenue',
     impact: 'Low' as const,
     action: 'Promote variety',
     priority: 3,
@@ -104,18 +104,18 @@ const mockInsights = [
   }
 ]
 
-// Mock recent activity data
-const mockRecentActivity = [
+// Recent activity for Bella Vista Bistro
+const bellaVistaActivity = [
   {
     id: 1,
-    action: 'Market analysis completed for downtown location',
+    action: 'Market analysis completed for Sukhumvit Soi 11 area',
     time: '2 hours ago',
     type: 'analysis' as const,
     icon: BarChart2
   },
   {
     id: 2,
-    action: 'New competitor detected: "Fresh Bites Cafe"',
+    action: 'New competitor detected: "Nonna\'s Kitchen"',
     time: '4 hours ago',
     type: 'feedback' as const,
     icon: Target
@@ -129,19 +129,19 @@ const mockRecentActivity = [
   },
   {
     id: 4,
-    action: 'Customer satisfaction survey completed',
+    action: 'Customer satisfaction survey completed (4.6/5 avg)',
     time: '2 days ago',
     type: 'feedback' as const,
     icon: Users
   }
 ]
 
-// Mock competitor data
-const mockTopCompetitors = [
-  { name: 'Bella Vista', distance: '0.2 mi', rating: 4.5, priceRange: '$$', marketShare: 18, trend: 'up' },
-  { name: 'Corner Cafe', distance: '0.4 mi', rating: 4.2, priceRange: '$', marketShare: 15, trend: 'down' },
-  { name: 'Urban Eats', distance: '0.6 mi', rating: 4.7, priceRange: '$$$', marketShare: 22, trend: 'up' },
-  { name: 'Quick Bites', distance: '0.3 mi', rating: 3.9, priceRange: '$', marketShare: 12, trend: 'stable' }
+// Competitor data for Sukhumvit area
+const sukhumvitCompetitors = [
+  { name: 'Nonna\'s Kitchen', distance: '200m', rating: 4.3, priceRange: '฿฿', marketShare: 12, trend: 'up' },
+  { name: 'Ciao Bella', distance: '350m', rating: 4.5, priceRange: '฿฿฿', marketShare: 18, trend: 'stable' },
+  { name: 'Mediterranean Delights', distance: '500m', rating: 4.1, priceRange: '฿฿', marketShare: 9, trend: 'down' },
+  { name: 'Pasta Paradise', distance: '400m', rating: 4.4, priceRange: '฿฿', marketShare: 14, trend: 'up' }
 ]
 
 export default function DashboardPage() {
@@ -202,24 +202,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <DashboardLayout
-      pageTitle="Market Intelligence Dashboard"
-      pageDescription="Get AI-powered insights for your restaurant business decisions"
-      headerActions={[
-        {
-          label: "Export Report",
-          icon: <Download className="h-4 w-4" />,
-          onClick: () => console.log('Export report'),
-          variant: 'outline'
-        },
-        {
-          label: "New Analysis",
-          icon: <Plus className="h-4 w-4" />,
-          onClick: () => router.push('/market-analysis'),
-          variant: 'default'
-        }
-      ]}
-    >
+    <div data-tour="dashboard">
+      {/* Header Actions */}
+      <div className="flex justify-end gap-2 mb-6">
+        <Button variant="outline" onClick={() => console.log('Export report')}>
+          <Download className="h-4 w-4 mr-2" />
+          Export Report
+        </Button>
+        <Button onClick={() => router.push('/market-analysis')}>
+          <Plus className="h-4 w-4 mr-2" />
+          New Analysis
+        </Button>
+      </div>
       {/* Key Metrics Overview */}
       <DashboardSection 
         title="Key Performance Metrics" 
@@ -234,58 +228,66 @@ export default function DashboardPage() {
         <DashboardGrid>
           <MetricCard
             title="Monthly Revenue"
-            value={placeholderMetrics.revenue.value}
-            change={placeholderMetrics.revenue.change}
+            value={bellaVistaMetrics.revenue.value}
+            change={bellaVistaMetrics.revenue.change}
             icon={<DollarSign className="h-5 w-5" />}
+            status="connected"
           />
           
           <MetricCard
             title="Customer Count"
-            value={placeholderMetrics.customers.value}
-            change={placeholderMetrics.customers.change}
+            value={bellaVistaMetrics.customers.value}
+            change={bellaVistaMetrics.customers.change}
             icon={<Users className="h-5 w-5" />}
+            status="connected"
           />
           
           <MetricCard
             title="Average Order"
-            value={placeholderMetrics.avgOrder.value}
-            change={placeholderMetrics.avgOrder.change}
+            value={bellaVistaMetrics.avgOrder.value}
+            change={bellaVistaMetrics.avgOrder.change}
             icon={<Utensils className="h-5 w-5" />}
+            status="connected"
           />
           
           <MetricCard
             title="Satisfaction Score"
-            value={placeholderMetrics.satisfaction.value}
-            change={placeholderMetrics.satisfaction.change}
+            value={bellaVistaMetrics.satisfaction.value}
+            change={bellaVistaMetrics.satisfaction.change}
             icon={<Star className="h-5 w-5" />}
+            status="connected"
           />
           
           <MetricCard
             title="Foot Traffic"
-            value={placeholderMetrics.footTraffic.value}
-            change={placeholderMetrics.footTraffic.change}
+            value={bellaVistaMetrics.footTraffic.value}
+            change={bellaVistaMetrics.footTraffic.change}
             icon={<MapPin className="h-5 w-5" />}
+            status="connected"
           />
           
           <MetricCard
             title="Conversion Rate"
-            value={placeholderMetrics.conversionRate.value}
-            change={placeholderMetrics.conversionRate.change}
+            value={bellaVistaMetrics.conversionRate.value}
+            change={bellaVistaMetrics.conversionRate.change}
             icon={<TrendingUp className="h-5 w-5" />}
+            status="connected"
           />
           
           <MetricCard
             title="Market Share"
-            value={placeholderMetrics.marketShare.value}
-            change={placeholderMetrics.marketShare.change}
+            value={bellaVistaMetrics.marketShare.value}
+            change={bellaVistaMetrics.marketShare.change}
             icon={<Target className="h-5 w-5" />}
+            status="connected"
           />
           
           <MetricCard
             title="Competitive Gap"
-            value={placeholderMetrics.competitorGap.value}
-            change={placeholderMetrics.competitorGap.change}
+            value={bellaVistaMetrics.competitorGap.value}
+            change={bellaVistaMetrics.competitorGap.change}
             icon={<BarChart2 className="h-5 w-5" />}
+            status="connected"
           />
         </DashboardGrid>
       </DashboardSection>
@@ -401,7 +403,7 @@ export default function DashboardPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">AI Insights</h3>
             <div className="space-y-3">
-              {mockInsights.map((insight) => (
+              {bellaVistaInsights.map((insight) => (
                 <InsightCard
                   key={insight.id}
                   type={insight.type}
@@ -442,7 +444,7 @@ export default function DashboardPage() {
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="p-6">
             <div className="space-y-1">
-              {mockRecentActivity.map((activity) => (
+              {bellaVistaActivity.map((activity) => (
                 <ActivityItem
                   key={activity.id}
                   action={activity.action}
@@ -534,7 +536,7 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockTopCompetitors.map((competitor, index) => (
+                  {sukhumvitCompetitors.map((competitor, index) => (
                     <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                       <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">{competitor.name}</td>
                       <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{competitor.distance}</td>
@@ -563,6 +565,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </DashboardSection>
-    </DashboardLayout>
+    </div>
   )
 }

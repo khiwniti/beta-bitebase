@@ -19,7 +19,9 @@ import {
   Clock,
   Star,
   MessageSquare,
-  Calendar
+  Calendar,
+  User,
+  LogOut
 } from 'lucide-react'
 import { Button } from "@bitebase/ui"
 import BiteBaseLogo from '../BiteBaseLogo'
@@ -150,6 +152,8 @@ interface SidebarProps {
   toggleCollapsed?: () => void
   mobileOpen?: boolean
   setMobileOpen?: (open: boolean) => void
+  userName?: string
+  restaurantName?: string
 }
 
 export function Sidebar({
@@ -157,11 +161,14 @@ export function Sidebar({
   collapsed = false,
   toggleCollapsed,
   mobileOpen = false,
-  setMobileOpen
+  setMobileOpen,
+  userName = "Maria Rodriguez",
+  restaurantName = "Bella Vista Bistro"
 }: SidebarProps) {
   const pathname = usePathname()
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
+  const [showUserMenu, setShowUserMenu] = useState(false)
   
   // Initialize expanded sections on load
   useEffect(() => {
@@ -392,39 +399,112 @@ export function Sidebar({
           </nav>
         </div>
         
-        {/* Sidebar footer - Pro upgrade */}
-        {!collapsed ? (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-900">
-            <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 dark:from-primary-600/20 dark:to-primary-700/20 rounded-lg p-4 border border-primary-100 dark:border-primary-900/50">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
-                  <Star className="w-4 h-4 text-primary-700 dark:text-primary-400" />
-                </div>
-                <h4 className="ml-3 font-medium text-gray-900 dark:text-white text-sm">BiteBase Pro</h4>
-                <span className="ml-auto px-1.5 py-0.5 text-xs rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-400">
-                  -20%
-                </span>
+        {/* Sidebar footer - User Profile */}
+        <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          {!collapsed ? (
+            <div className="p-4">
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 transition-colors"
+                  aria-label="User menu"
+                  aria-expanded={showUserMenu}
+                >
+                  <div className="relative">
+                    <div className="h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-700 dark:text-primary-300 font-medium">
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></span>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="font-medium text-sm text-gray-900 dark:text-white truncate">{userName}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{restaurantName}</p>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {showUserMenu && (
+                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg z-50 py-2 animate-fadeInUp">
+                    <Link
+                      href="/settings/profile" 
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <User className="w-4 h-4 mr-3 text-gray-400 dark:text-gray-500" />
+                      Your Profile
+                    </Link>
+                    <Link
+                      href="/settings/restaurant" 
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <Settings className="w-4 h-4 mr-3 text-gray-400 dark:text-gray-500" />
+                      Restaurant Settings
+                    </Link>
+                    <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+                    <Link
+                      href="/auth/signout" 
+                      className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <LogOut className="w-4 h-4 mr-3" />
+                      Sign Out
+                    </Link>
+                  </div>
+                )}
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
-                Unlock premium features for deeper market analysis and competitor insights
-              </p>
-              <Button
-                className="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium"
-              >
-                Upgrade Now
-              </Button>
             </div>
-          </div>
-        ) : (
-          <div className="p-2 border-t border-gray-200 dark:border-gray-800">
-            <Button
-              className="w-full p-2 flex justify-center bg-primary-600 hover:bg-primary-700 text-white"
-              aria-label="Upgrade to Pro"
-            >
-              <Star className="h-4 w-4" />
-            </Button>
+          ) : (
+            <div className="p-2">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="w-full p-2 flex justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 relative"
+                aria-label="User menu"
+              >
+                <div className="relative">
+                  <div className="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-700 dark:text-primary-300 font-medium text-sm">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></span>
+                </div>
+                
+                {showUserMenu && (
+                  <div className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg z-50 py-2 animate-fadeInUp">
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                      <p className="font-medium text-sm text-gray-900 dark:text-white">{userName}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{restaurantName}</p>
+                    </div>
+                    <Link
+                      href="/settings/profile" 
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <User className="w-4 h-4 mr-3 text-gray-400 dark:text-gray-500" />
+                      Your Profile
+                    </Link>
+                    <Link
+                      href="/settings/restaurant" 
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <Settings className="w-4 h-4 mr-3 text-gray-400 dark:text-gray-500" />
+                      Restaurant Settings
+                    </Link>
+                    <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+                    <Link
+                      href="/auth/signout" 
+                      className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <LogOut className="w-4 h-4 mr-3" />
+                      Sign Out
+                    </Link>
+                  </div>
+                )}
+              </button>
+            </div>
+          )}
         </div>
-        )}
       </div>
     </>
   )

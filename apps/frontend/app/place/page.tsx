@@ -42,7 +42,7 @@ export default function PlacePage() {
             period: 'vs last week',
             trend: 'up' as const
           }}
-          icon={Eye}
+          icon={<Eye className="h-5 w-5" />}
           variant="success"
           description="Peak: 12-2 PM, 7-9 PM"
         />
@@ -55,7 +55,7 @@ export default function PlacePage() {
             period: 'vs last month',
             trend: 'up' as const
           }}
-          icon={Target}
+          icon={<Target className="h-5 w-5" />}
           variant="success"
           description="High growth opportunity"
         />
@@ -68,7 +68,7 @@ export default function PlacePage() {
             period: 'vs last quarter',
             trend: 'down' as const
           }}
-          icon={Building}
+          icon={<Building className="h-5 w-5" />}
           variant="warning"
           description="Restaurants within 1 mile"
         />
@@ -81,7 +81,7 @@ export default function PlacePage() {
             period: 'vs last assessment',
             trend: 'up' as const
           }}
-          icon={Star}
+          icon={<Star className="h-5 w-5" />}
           variant="success"
           description="Overall location rating"
         />

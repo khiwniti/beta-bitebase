@@ -4,8 +4,8 @@ import React, { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Header from './header'
 import Sidebar from './sidebar'
-import { WebTour } from '../tour/WebTour'
-import { TourTrigger } from '../tour/TourTrigger'
+import { WebTour, useTour } from '../tour/WebTour'
+import { TourTrigger, WelcomeBanner } from '../tour/TourTrigger'
 
 interface PageWrapperProps {
   children: React.ReactNode
@@ -31,12 +31,15 @@ export function PageWrapper({
   showSidebar = true,
   navItems,
   headerActions,
-  restaurantName = "Your Restaurant",
-  userName = "Restaurant Manager"
+  restaurantName = "Bella Vista Bistro",
+  userName = "Maria Rodriguez"
 }: PageWrapperProps) {
   const pathname = usePathname()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
+  // Tour state management
+  const { isTourOpen, isFirstTimeUser, startTour, closeTour, completeTour } = useTour()
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed)
@@ -44,8 +47,13 @@ export function PageWrapper({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
-      {/* Tour integration */}
-      <WebTour />
+      {/* Tour integration with proper props */}
+      <WebTour 
+        isOpen={isTourOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+        isFirstTimeUser={isFirstTimeUser}
+      />
 
       {/* Sidebar */}
       {showSidebar && (
@@ -54,6 +62,8 @@ export function PageWrapper({
           toggleCollapsed={toggleSidebar}
           mobileOpen={mobileSidebarOpen}
           setMobileOpen={setMobileSidebarOpen}
+          userName={userName}
+          restaurantName={restaurantName}
         />
       )}
 
@@ -72,9 +82,9 @@ export function PageWrapper({
             {/* Welcome Banner */}
             {showWelcomeBanner && (
               <div className="mb-6">
-                <TourTrigger />
-        </div>
-      )}
+                <WelcomeBanner onStartTour={startTour} />
+              </div>
+            )}
 
             {/* Page header */}
             {(pageTitle || pageDescription) && (
@@ -143,6 +153,8 @@ export function PageWrapper({
         </div>
         </footer>
       </div>
+
+
     </div>
   )
 }
