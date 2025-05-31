@@ -192,8 +192,8 @@ export function MainLayout({
         }
         
         // If the item has subitems and one is active, expand it
-        if (item.subitems) {
-          item.subitems.forEach(subitem => {
+        if ('subitems' in item && item.subitems) {
+          (item as any).subitems.forEach((subitem: any) => {
             if (pathname === subitem.href) {
               setExpandedItems(prev => ({ ...prev, [item.name]: true }));
             }
@@ -235,6 +235,7 @@ export function MainLayout({
   }
 
   const isActive = (href: string) => {
+    if (!pathname) return false;
     if (href === '/dashboard') {
       return pathname === href
     }
@@ -268,8 +269,8 @@ export function MainLayout({
         }
         
         // Check subitems
-        if (item.subitems) {
-          item.subitems.forEach(subitem => {
+        if ('subitems' in item && item.subitems) {
+          (item as any).subitems.forEach((subitem: any) => {
             if (pathname === subitem.href) {
               currentSection = section.name;
               if (!pageTitle) {
@@ -290,7 +291,11 @@ export function MainLayout({
   return (
     <div className={`h-screen flex overflow-hidden ${darkMode ? 'dark' : ''}`}>
       {/* Web Tour Integration */}
-      <WebTour />
+      <WebTour
+        isOpen={isTourOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+      />
       
       {/* Sidebar - Improved with cleaner styling */}
       {showSidebar && (
@@ -341,7 +346,7 @@ export function MainLayout({
                               ${isActive(item.href) 
                                 ? 'bg-primary-50 text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30' 
                                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                              } ${item.highlight ? 'border border-dashed border-primary-400 dark:border-primary-700' : ''}`}
+                              } ${'highlight' in item && item.highlight ? 'border border-dashed border-primary-400 dark:border-primary-700' : ''}`}
                             aria-current={isActive(item.href) ? 'page' : undefined}
                             data-tour-id={item.tourId}
                           >
@@ -364,14 +369,14 @@ export function MainLayout({
                             {!collapsedSidebar && (
                               <div className="flex items-center">
                                 {/* Badge if relevant */}
-                                            {item.badge && (
+                                            {'badge' in item && item.badge && (
                                   <span className="px-2 py-1 ml-2 text-xs rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-400">
-                                                {item.badge}
+                                                {(item as any).badge}
                                               </span>
                                             )}
                                 
                                 {/* Chevron for items with subitems */}
-                                            {item.subitems && (
+                                            {'subitems' in item && item.subitems && (
                                                 <ChevronDown
                                     className={`h-4 w-4 ml-1 transition-transform ${
                                       expandedItems[item.name] ? 'transform rotate-180' : ''
@@ -387,9 +392,9 @@ export function MainLayout({
                                     </Link>
                                     
                           {/* Subitems dropdown */}
-                                    {!collapsedSidebar && item.subitems && expandedItems[item.name] && (
+                                    {!collapsedSidebar && 'subitems' in item && item.subitems && expandedItems[item.name] && (
                             <div className="ml-10 mt-1 space-y-1">
-                              {item.subitems.map((subitem) => (
+                              {(item as any).subitems.map((subitem: any) => (
                                             <Link
                                               key={subitem.name}
                                               href={subitem.href}
@@ -636,7 +641,7 @@ export function MainLayout({
             {/* Welcome Banner */}
             {showWelcomeBanner && (
               <div className="mb-6">
-                <TourTrigger />
+                <TourTrigger onStartTour={startTour} />
               </div>
             )}
             

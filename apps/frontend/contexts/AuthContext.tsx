@@ -9,6 +9,7 @@ interface User {
   email: string
   role: string
   name?: string
+  displayName?: string // For compatibility with existing code
   uid?: string // For compatibility with existing code
 }
 

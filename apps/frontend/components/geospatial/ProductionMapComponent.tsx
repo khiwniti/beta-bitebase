@@ -37,7 +37,7 @@ const MapEventsComponent = dynamic(
 )
 
 interface Restaurant {
-  id: number
+  id: string
   name: string
   latitude: number
   longitude: number
