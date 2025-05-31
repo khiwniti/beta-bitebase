@@ -42,8 +42,6 @@ export function Header({ onOpenSidebar, userName = 'Maria Rodriguez', restaurant
           </button>
           
           <div className="hidden md:flex items-center gap-3">
-            <BiteBaseLogo size="xs" />
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
             <div>
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{restaurantName}</h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">Culinary Intelligence Platform</p>

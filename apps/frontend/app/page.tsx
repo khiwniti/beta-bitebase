@@ -55,6 +55,9 @@ export default function HomePage() {
                   <a href="#testimonials" className="nav-link-inactive px-3 py-2 text-sm font-medium">
                     Testimonials
                   </a>
+                  <Link href="/demo-login" className="nav-link-inactive px-3 py-2 text-sm font-medium">
+                    Demo Login
+                  </Link>
                   <Link href="/auth" className="nav-link-inactive px-3 py-2 text-sm font-medium">
                     Sign In
                   </Link>

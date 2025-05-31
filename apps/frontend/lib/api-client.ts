@@ -83,8 +83,8 @@ class ApiClient {
 
   constructor() {
     // Use environment variables or fallback to runtime URLs
-    // Backend Restaurant API on work-2 (port 12001)
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://work-2-iedxpnjtcfddboej.prod-runtime.all-hands.dev';
+    // Backend Restaurant API on localhost:12001 - User Backend Service
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:12001';
     // AI Agent on localhost:8000, accessed via frontend proxy
     this.agentUrl = process.env.NEXT_PUBLIC_AGENT_URL || '';
   }
@@ -135,7 +135,7 @@ class ApiClient {
 
   // Health checks
   async checkBackendHealth(): Promise<ApiResponse<{ status: string; message: string }>> {
-    return this.request('/api/health');
+    return this.request('/health');
   }
 
   async checkAgentHealth(): Promise<ApiResponse<{ status: string; version: string }>> {
@@ -144,7 +144,14 @@ class ApiClient {
 
   // Restaurant data endpoints
   async getAllRestaurants(): Promise<ApiResponse<Restaurant[]>> {
-    return this.request('/api/restaurants');
+    const response = await this.request<{ restaurants: Restaurant[]; total: number; limit: number; offset: number }>('/api/restaurants');
+    if (response.error) {
+      return response;
+    }
+    return {
+      data: response.data?.restaurants || [],
+      status: response.status,
+    };
   }
 
   async getRestaurantById(id: string): Promise<ApiResponse<Restaurant>> {

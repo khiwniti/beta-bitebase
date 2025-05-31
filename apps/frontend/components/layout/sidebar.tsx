@@ -108,10 +108,22 @@ const navigation: NavigationSection[] = [
     name: "Operations",
     items: [
       {
-        name: "Restaurant Setup",
-        href: "/restaurant-setup",
-        icon: Utensils,
-        description: "Setup & configuration"
+        name: "Restaurant Settings",
+        href: "/restaurant-settings",
+        icon: Settings,
+        description: "Restaurant configuration & setup"
+      },
+      {
+        name: "POS Integration",
+        href: "/pos-integration",
+        icon: DollarSign,
+        description: "Connect your POS system"
+      },
+      {
+        name: "Campaign Management",
+        href: "/campaigns",
+        icon: Megaphone,
+        description: "Monitor marketing campaigns & projects"
       },
       {
         name: "Reviews & Ratings",

@@ -5,184 +5,38 @@ npm warn config ignoring workspace config at /workspace/beta-bitebase/apps/front
 
    ▲ Next.js 14.0.4
    - Local:        http://localhost:12000
-   - Environments: .env.local
 
- ✓ Ready in 2s
+ ✓ Ready in 2.4s
  ○ Compiling / ...
- ✓ Compiled / in 4.1s (990 modules)
- ✓ Compiled in 760ms (505 modules)
- ⨯ ./app/restaurant-setup/page.tsx
-Error: 
-  [31mx[0m Unexpected token `div`. Expected jsx identifier
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:463:1]
- [2m463[0m |   }
- [2m464[0m | 
- [2m465[0m |   return (
- [2m466[0m |     <div className="space-y-8">
-     : [31;1m     ^^^[0m
- [2m467[0m |       {/* Page Header */}
- [2m468[0m |       <DashboardSection
- [2m469[0m |         title="Restaurant Setup"
-     `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/restaurant-setup/page.tsx
+ ✓ Compiled / in 5.1s (990 modules)
  ○ Compiling /not-found ...
- ⨯ ./app/restaurant-setup/page.tsx
-Error: 
-  [31mx[0m Unexpected token `div`. Expected jsx identifier
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:463:1]
- [2m463[0m |   }
- [2m464[0m | 
- [2m465[0m |   return (
- [2m466[0m |     <div className="space-y-8">
-     : [31;1m     ^^^[0m
- [2m467[0m |       {/* Page Header */}
- [2m468[0m |       <DashboardSection
- [2m469[0m |         title="Restaurant Setup"
-     `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/restaurant-setup/page.tsx
- ⨯ ./app/restaurant-setup/page.tsx
-Error: 
-  [31mx[0m Unexpected token `div`. Expected jsx identifier
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:463:1]
- [2m463[0m |   }
- [2m464[0m | 
- [2m465[0m |   return (
- [2m466[0m |     <div className="space-y-8">
-     : [31;1m     ^^^[0m
- [2m467[0m |       {/* Page Header */}
- [2m468[0m |       <DashboardSection
- [2m469[0m |         title="Restaurant Setup"
-     `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/restaurant-setup/page.tsx
- ✓ Compiled /_error in 540ms (629 modules)
- ⨯ ./app/restaurant-setup/page.tsx
-Error: 
-  [31mx[0m Unexpected token `< (jsx tag start)`. Expected identifier, string literal, numeric literal or [ for the computed key
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:471:1]
- [2m471[0m |         title="Restaurant Setup"
- [2m472[0m |         description="AI-powered market research and location analysis for your restaurant"
- [2m473[0m |         actions={
- [2m474[0m |         <button
-     : [31;1m        ^[0m
- [2m475[0m |           onClick={() => console.log('Save progress')}
- [2m476[0m |           className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
- [2m477[0m |         >
-     `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/restaurant-setup/page.tsx
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
- ⨯ ./app/restaurant-setup/page.tsx
-Error: 
-  [31mx[0m Unexpected token `div`. Expected jsx identifier
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:463:1]
- [2m463[0m |   }
- [2m464[0m | 
- [2m465[0m |   return (
- [2m466[0m |     <div className="space-y-8">
-     : [31;1m     ^^^[0m
- [2m467[0m |       {/* Page Header */}
- [2m468[0m |       <DashboardSection
- [2m469[0m |         title="Restaurant Setup"
-     `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/restaurant-setup/page.tsx
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
- ✓ Compiled in 404ms (629 modules)
- ✓ Compiled in 898ms (1160 modules)
- ⨯ ./app/restaurant-setup/page.tsx
-Error: 
-  [31mx[0m Unexpected token `div`. Expected jsx identifier
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:463:1]
- [2m463[0m |   }
- [2m464[0m | 
- [2m465[0m |   return (
- [2m466[0m |     <div className="space-y-8">
-     : [31;1m     ^^^[0m
- [2m467[0m |       {/* Page Header */}
- [2m468[0m |       <DashboardSection
- [2m469[0m |         title="Restaurant Setup"
-     `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/restaurant-setup/page.tsx
- ⨯ ./app/restaurant-setup/page.tsx
-Error: 
-  [31mx[0m Expression expected
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:471:1]
- [2m471[0m |         <button
- [2m472[0m |           onClick={() => console.log('Save progress')}
- [2m473[0m |           className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
- [2m474[0m |         >
-     : [31;1m        ^[0m
- [2m475[0m |           <Save className="h-4 w-4" />
- [2m476[0m |           <span>Save Progress</span>
- [2m477[0m |         </button>
-     `----
-
-  [31mx[0m Expected ';', '}' or <eof>
-     ,-[[36;1;4m/workspace/beta-bitebase/apps/frontend/app/restaurant-setup/page.tsx[0m:471:1]
- [2m471[0m |             <button
- [2m472[0m |               onClick={() => console.log('Save progress')}
- [2m473[0m |               className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
- [2m474[0m | [31;1m,[0m[31;1m-[0m[31;1m>[0m         >
- [2m475[0m | [31;1m|[0m             <Save className="h-4 w-4" />
- [2m476[0m | [31;1m|[0m[31;1m-[0m[31;1m>[0m           <span>Save Progress</span>
-     : [31;1m`[0m[31;1m---[0m[33;1m                     ^^^^^^^^[0m
-     : [31;1m`[0m[31;1m---[0m[31;1m-[0m [31;1mThis is the expression part of an expression statement[0m
- [2m477[0m |             </button>
- [2m478[0m |             }
- [2m479[0m |           />
-     `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/restaurant-setup/page.tsx
- ✓ Compiled in 1247ms (1256 modules)
- ✓ Compiled in 658ms (1160 modules)
- ✓ Compiled in 493ms (661 modules)
- ✓ Compiled in 125ms (614 modules)
- ✓ Compiled in 406ms (628 modules)
- ✓ Compiled /restaurant-setup in 342ms (518 modules)
- ✓ Compiled /not-found in 216ms (1137 modules)
- ✓ Compiled in 158ms (1137 modules)
- ✓ Compiled in 232ms (1137 modules)
- ✓ Compiled / in 226ms (530 modules)
- ✓ Compiled in 775ms (1162 modules)
- ✓ Compiled in 656ms (676 modules)
- ✓ Compiled in 622ms (629 modules)
- ✓ Compiled in 363ms (629 modules)
- ✓ Compiled /restaurant-setup in 136ms (519 modules)
- ✓ Compiled /not-found in 175ms (1139 modules)
- ✓ Compiled in 239ms (662 modules)
- ✓ Compiled /restaurant-setup in 141ms (519 modules)
- ✓ Compiled /not-found in 152ms (1139 modules)
+ ✓ Compiled /not-found in 4.3s (981 modules)
+ ✓ Compiled /demo-login in 233ms (995 modules)
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 918ms (1055 modules)
+ ✓ Compiled /restaurant-setup in 263ms (1061 modules)
+ ○ Compiling /market-analysis ...
+ ✓ Compiled /market-analysis in 1225ms (1080 modules)
+ ✓ Compiled in 1162ms (1089 modules)
+ ✓ Compiled in 482ms (1089 modules)
+ ✓ Compiled in 498ms (1089 modules)
+ ✓ Compiled /not-found in 226ms (1080 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 586ms (542 modules)
+ ✓ Compiled /not-found in 387ms (1087 modules)
+ ✓ Compiled /auth in 284ms (1093 modules)
+ ✓ Compiled in 958ms (1107 modules)
+ ✓ Compiled in 709ms (1087 modules)
+ ✓ Compiled in 448ms (554 modules)
+ ✓ Compiled in 821ms (1075 modules)
+ ✓ Compiled in 306ms (554 modules)
+ ✓ Compiled in 803ms (1075 modules)
+ ✓ Compiled in 994ms (1089 modules)
+ ✓ Compiled in 502ms (1089 modules)
+ ✓ Compiled in 517ms (1089 modules)
+ ✓ Compiled in 327ms (554 modules)
+ ✓ Compiled in 481ms (554 modules)
+ ✓ Compiled in 351ms (554 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 514ms (542 modules)
+[?25h

@@ -4,19 +4,13 @@
   "description": "BiteBase Backend API for Cloudflare Workers",
   "main": "cloudflare-worker.js",
   "scripts": {
-    "dev": "wrangler dev",
+    "start": "node minimal-server.js",
+    "dev": "node minimal-server.js",
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",
-    "tail": "wrangler tail",
-    "express:start": "node express-server.js",
-    "simple:start": "node simple-server.js",
-    "enhanced:start": "node enhanced-server.js",
-    "enhanced:dev": "nodemon enhanced-server.js",
-    "agent:start": "node agent-adapter.js",
     "test": "vitest",
     "db:create": "wrangler d1 create bitebase-production",
-    "db:migrate": "wrangler d1 execute bitebase-production --file=../../database/schema.sql",
-    "db:migrate:local": "wrangler d1 execute bitebase-production --local --file=../../database/schema.sql"
+    "db:migrate": "wrangler d1 execute bitebase-production --file=../../database/schema.sql"
   },
   "dependencies": {
     "axios": "^1.9.0",

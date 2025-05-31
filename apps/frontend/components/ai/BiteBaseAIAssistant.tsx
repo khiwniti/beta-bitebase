@@ -58,7 +58,7 @@ const BiteBaseAIAssistant: React.FC<BiteBaseAIAssistantProps> = ({
   // Load user's chat history
   const loadChatHistory = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/chat/history/${userId}?limit=5`);
+      const response = await fetch(`http://localhost:12001/api/chat/history/${userId}?limit=5`);
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.history.length > 0) {
@@ -86,7 +86,7 @@ const BiteBaseAIAssistant: React.FC<BiteBaseAIAssistantProps> = ({
   // Send message to AI assistant
   const sendMessage = async (message: string) => {
     try {
-      const response = await fetch('http://localhost:8080/api/chat', {
+      const response = await fetch('http://localhost:12001/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ const BiteBaseAIAssistant: React.FC<BiteBaseAIAssistantProps> = ({
   // Clear chat history
   const clearChat = async () => {
     try {
-      await fetch(`http://localhost:8080/api/chat/session/${userId}`, {
+      await fetch(`http://localhost:12001/api/chat/session/${userId}`, {
         method: 'DELETE'
       });
       setMessages([]);

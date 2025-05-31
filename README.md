@@ -1,234 +1,177 @@
-# 🍽️ BiteBase Intelligence - Production-Ready Restaurant SaaS Platform
+# BiteBase - Restaurant Intelligence Platform
 
-A comprehensive, AI-powered restaurant intelligence platform with enterprise-grade features, real-time market analysis, and advanced geospatial capabilities. **Now production-ready with all placeholders replaced by real implementations.**
-
-## 🌟 **What's New - Production Ready!**
-
-✅ **All mock data replaced with real API integrations**
-✅ **Enterprise-grade security and authentication**
-✅ **Production-ready error handling and monitoring**
-✅ **SEO optimized for search visibility**
-✅ **Performance optimized for scale**
-✅ **Comprehensive analytics and tracking**
-
-## 🏗️ **Enterprise Architecture**
-
-BiteBase follows a microservices architecture with specialized frontends for different user roles and use cases:
-
-### 🖥️ **Frontend Applications**
-- **User Frontend** (Port 3000) - `bitebase.com` - Main user interface
-- **Staff Frontend** (Port 3001) - `staff.bitebase.com` - Admin portal
-- **Tools Frontend** (Port 3002) - `tools.bitebase.com` - MCP server management
-- **Workflows Frontend** (Port 3003) - `workflows.bitebase.com` - AI workflow management
-- **Backend Tasks Frontend** (Port 3004) - `tasks.bitebase.com` - System monitoring
-
-### 🔧 **Backend Services**
-- **User Backend** (Port 8000) - Main API for user operations
-- **CopilotKit Service** (Port 8001) - AI assistant with WebSocket support
-- **MCP Gateway** (Port 8002) - Model Context Protocol gateway
-- **LangGraph Agent** (Port 8003) - AI workflow orchestration
-- **A2A Server** (Port 8004) - Agent-to-agent communication
-- **Staff Backend** (Port 8005) - Admin API endpoints
-
-### 🛠️ **Production Infrastructure**
-- **PostgreSQL** with PostGIS - Primary database with clustering
-- **Redis** - Caching, sessions, and real-time features
-- **CDN** - Global content delivery
-- **Load Balancers** - High availability and scaling
-- **Monitoring Stack** - Sentry, Mixpanel, Google Analytics
-- **Security Layer** - WAF, DDoS protection, encryption
+A comprehensive geospatial SaaS platform for restaurant market analysis and business intelligence.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- Python 3.9+
-- Docker (recommended)
-- Git
+- Node.js 18+ 
+- npm or yarn
+- Docker (optional)
 
-### 1. Clone the Repository
+### Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/khiwniti/beta-bitebase.git
+   cd beta-bitebase
+   ```
+
+2. **Install dependencies**
+   ```bash
+   # Frontend
+   cd apps/frontend
+   npm install
+   
+   # Backend
+   cd ../backend
+   npm install
+   ```
+
+3. **Environment Configuration**
+   ```bash
+   # Copy environment template
+   cp .env.production .env.local
+   # Update with your configuration
+   ```
+
+4. **Start Development Servers**
+   ```bash
+   # Terminal 1 - Backend
+   cd apps/backend
+   npm run dev
+   
+   # Terminal 2 - Frontend
+   cd apps/frontend
+   npm run dev
+   ```
+
+5. **Access the Application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001
+
+## 🏗️ Architecture
+
+### Frontend (Next.js)
+- **Framework**: Next.js 14 with App Router
+- **UI**: Tailwind CSS + Radix UI components
+- **State Management**: React Query
+- **Maps**: Leaflet with React Leaflet
+- **Charts**: Chart.js + Recharts
+
+### Backend (Node.js)
+- **Framework**: Express.js
+- **API**: RESTful endpoints
+- **CORS**: Configured for cross-origin requests
+- **Data**: Mock data with extensible structure
+
+## 📦 Deployment
+
+### Option 1: Using Docker
 ```bash
-git clone <repository-url>
-cd bitebase-geospatial-saas
+# Build and run with Docker Compose
+docker-compose -f docker-compose.production.yml up --build
 ```
 
-### 2. Environment Setup
+### Option 2: Manual Deployment
 ```bash
-# Copy environment template
-cp .env.example .env
+# Run the deployment script
+./deploy.sh
 
-# Edit environment variables
-nano .env
+# Deploy the generated dist/ folder to your hosting platform
 ```
 
-### 3. Start Development Environment
+### Option 3: Platform-Specific
+
+#### Vercel (Frontend)
 ```bash
-# Install dependencies and start all services
-./scripts/start-dev.sh --install
-
-# Or start without installing dependencies
-./scripts/start-dev.sh
+cd apps/frontend
+vercel --prod
 ```
 
-### 4. Using Docker Compose (Alternative)
+#### Railway/Heroku (Backend)
 ```bash
-# Start entire platform with Docker
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
+cd apps/backend
+# Follow platform-specific deployment instructions
 ```
 
-## 🌐 Service URLs
+## 🔧 Configuration
 
-### Frontend Applications
-- **User Interface**: http://localhost:3000
-- **Staff Portal**: http://localhost:3001
-- **Tools Dashboard**: http://localhost:3002
-- **Workflows Manager**: http://localhost:3003
-- **System Monitor**: http://localhost:3004
+### Environment Variables
 
-### Backend APIs
-- **User API**: http://localhost:8000/docs
-- **CopilotKit**: http://localhost:8001/docs
-- **MCP Gateway**: http://localhost:8002/docs
-
-### Monitoring
-- **Grafana**: http://localhost:3005 (admin/admin)
-- **Prometheus**: http://localhost:9090
-
-## 📁 Project Structure
-
+#### Frontend (.env.local)
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_ENVIRONMENT=development
+NEXT_PUBLIC_FIREBASE_API_KEY=your-key
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-token
 ```
-bitebase-geospatial-saas/
+
+#### Backend (.env)
+```env
+NODE_ENV=development
+PORT=3001
+CORS_ORIGIN=http://localhost:3000
+```
+
+## 📊 Features
+
+- **Market Analysis**: Interactive maps and market metrics
+- **Restaurant Explorer**: Browse and analyze restaurant data
+- **AI Insights**: Market opportunities and recommendations
+- **Dashboard**: Comprehensive business intelligence
+- **Multi-language**: English and Thai support
+
+## 🛠️ Development
+
+### Project Structure
+```
+beta-bitebase/
 ├── apps/
-│   ├── frontend/           # Next.js frontend application
-│   │   ├── app/           # App Router pages
-│   │   ├── components/    # React components
-│   │   └── lib/          # Utilities and helpers
-│   ├── backend/           # Strapi backend
-│   │   ├── src/api/      # API endpoints
-│   │   ├── config/       # Configuration files
-│   │   └── public/       # Static assets
-│   └── docs/             # Documentation site
-├── packages/
-│   ├── ui/               # Shared UI components
-│   ├── eslint-config/    # ESLint configuration
-│   └── typescript-config/ # TypeScript configuration
-├── package.json          # Root package.json
-├── turbo.json           # Turborepo configuration
-└── README.md            # This file
+│   ├── frontend/          # Next.js application
+│   └── backend/           # Express.js API
+├── database/              # Database schemas
+├── agent/                 # AI agent services
+└── deploy.sh             # Deployment script
 ```
 
-## 🔧 Available Scripts
+### API Endpoints
+- `GET /health` - Health check
+- `GET /api/restaurants` - Restaurant data
+- `GET /api/market-analyses` - Market analysis data
 
-### Root Level
-- `yarn dev` - Start all applications in development mode
-- `yarn build` - Build all applications
-- `yarn lint` - Lint all packages
-- `yarn format` - Format code with Prettier
+### Adding New Features
+1. Backend: Add routes in `apps/backend/minimal-server.js`
+2. Frontend: Create components in `apps/frontend/components/`
+3. API: Update client in `apps/frontend/lib/api-client.ts`
 
-### Frontend
-- `yarn dev` - Start development server
-- `yarn build` - Build for production
-- `yarn start` - Start production server
-- `yarn lint` - Lint frontend code
+## 🔍 Troubleshooting
 
-### Backend
-- `yarn dev` - Start Strapi in development mode
-- `yarn build` - Build Strapi
-- `yarn start` - Start Strapi in production mode
+### Common Issues
 
-## 🗺️ Key Features
+1. **CORS Errors**
+   - Check backend CORS configuration
+   - Verify frontend API URL
 
-### Geospatial Analysis
-- Interactive maps with restaurant locations
-- Heatmap overlays for market density
-- Competition analysis visualization
-- Demographic layer integration
+2. **Build Failures**
+   - Clear node_modules: `rm -rf node_modules && npm install`
+   - Check TypeScript errors: `npm run check-types`
 
-### Market Research Tools
-- Market opportunity scoring
-- Competition intensity analysis
-- Revenue projection modeling
-- Demographic matching
+3. **Port Conflicts**
+   - Frontend: Change PORT in package.json
+   - Backend: Update PORT environment variable
 
-### Analytics Dashboard
-- Real-time metrics and KPIs
-- Interactive charts and graphs
-- Market trend analysis
-- Performance tracking
+## 📝 License
 
-### Report Generation
-- Automated report creation
-- PDF and Excel export options
-- Customizable templates
-- Scheduled reporting
-
-## 🔌 API Endpoints
-
-### Restaurants
-- `GET /api/restaurants` - List all restaurants
-- `GET /api/restaurants/:id` - Get restaurant details
-- `GET /api/restaurants/by-location` - Find restaurants by location
-- `GET /api/restaurants/:id/analytics` - Get restaurant analytics
-
-### Market Analysis
-- `POST /api/market-analyses` - Create new analysis
-- `GET /api/market-analyses/:id` - Get analysis results
-- `GET /api/market-analyses/summary` - Get analysis summary
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-yarn test
-
-# Run tests for specific package
-yarn test --filter=frontend
-yarn test --filter=backend
-```
-
-## 🚀 Deployment
-
-### Frontend (Vercel)
-```bash
-yarn build --filter=frontend
-```
-
-### Backend (Railway/Heroku)
-```bash
-yarn build --filter=backend
-yarn start --filter=backend
-```
+MIT License - see LICENSE file for details.
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## 📄 License
+## 📞 Support
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation in `/apps/docs`
-
-## 🔮 Roadmap
-
-- [ ] Advanced ML-based market predictions
-- [ ] Real-time data integration
-- [ ] Mobile application
-- [ ] Advanced geofencing capabilities
-- [ ] Integration with external data sources
-- [ ] Multi-language support
+For support and questions, please open an issue in the GitHub repository.

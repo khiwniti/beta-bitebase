@@ -36,20 +36,50 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  // For demo purposes, set a mock user and skip authentication
-  const [user, setUser] = useState<User | null>({
-    id: 1,
-    email: 'demo@bitebase.com',
-    role: 'owner',
-    name: 'Demo User',
-    uid: '1',
-    displayName: 'Demo User'
-  })
-  const [loading, setLoading] = useState(false)
-  const [mounted, setMounted] = useState(true)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   // Backend API base URL
-  const API_BASE = 'https://work-2-iedxpnjtcfddboej.prod-runtime.all-hands.dev/api'
+  const API_BASE = process.env.NODE_ENV === 'production' 
+    ? 'https://work-2-gjqewehruzacrehd.prod-runtime.all-hands.dev/api'
+    : 'http://localhost:12001/api'
+
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('bitebase_token')
+      if (token) {
+        try {
+          const response = await fetch(`${API_BASE}/auth/profile`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          
+          if (response.ok) {
+            const userData = await response.json()
+            setUser({
+              id: userData.id,
+              email: userData.email,
+              role: userData.role,
+              name: userData.name,
+              uid: userData.id.toString()
+            })
+          } else {
+            localStorage.removeItem('bitebase_token')
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error)
+          localStorage.removeItem('bitebase_token')
+        }
+      }
+      setLoading(false)
+      setMounted(true)
+    }
+    
+    checkAuth()
+  }, [])
 
   // Skip hydration check for demo
 

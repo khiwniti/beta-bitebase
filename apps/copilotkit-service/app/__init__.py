@@ -1,1 +1,0 @@
-# CopilotKit Service Package
