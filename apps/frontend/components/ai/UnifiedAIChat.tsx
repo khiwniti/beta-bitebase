@@ -6,19 +6,10 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Textarea, Card, CardContent, CardFooter, CardHeader, CardTitle, Avatar, AvatarFallback, AvatarImage, Sele              {/* Display marketing research actions after assistant responses */}
-              {message.role === 'assistant' && message.isMarketingResponse && index === messages.length - 1 && (
-                <div className="w-full mt-4">
-                  <MarketingResearchActions
-                    onRequestAction={handleMarketingAction}
-                    query={messages.find(m => m.role === 'user')?.content || ''}
-                  />
-                </div>
-              )}ntent, SelectItem, SelectTrigger, SelectValue } from '@bitebase/ui';
-import { Bot, Send, Trash, User } from 'lucide-react';
+import { Button, Textarea, Card, CardContent, CardFooter, CardHeader, CardTitle, Avatar, AvatarFallback, AvatarImage, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@bitebase/ui';
+import { Send, Bot, User, Loader2, MessageSquare, Zap, TrendingUp, MapPin, BarChart3, Users, DollarSign, Clock, Star } from 'lucide-react';
+import { MarketingResearchActions } from './MarketingResearchActions';
 import MarketingResearchVisualizer from './MarketingResearchVisualizer';
-import MarketingResearchActions from './MarketingResearchActions';
-import './marketing-research.css';
 
 // Define props for the UnifiedAIChat component
 interface UnifiedAIChatProps {
@@ -105,53 +96,6 @@ const useAI = () => {
 
   const clearMessages = () => setMessages([]);
 
-  // Handle marketing research actions
-  const handleMarketingAction = async (action: string, parameters: Record<string, any>) => {
-    setIsLoading(true);
-    
-    try {
-      // In a real implementation, this would call the API endpoint
-      // For now, we'll simulate a response
-      setTimeout(() => {
-        const actionResponses = {
-          'marketing_research': 'Here is your comprehensive marketing research report.',
-          'competitive_analysis': 'I\'ve analyzed your competitors and found these insights.',
-          'marketing_campaign': 'Here\'s a marketing campaign strategy tailored for your business.',
-          'marketing_ideas': 'I\'ve generated some creative marketing ideas for your consideration.',
-        };
-        
-        // Add the response to the chat
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: actionResponses[action as keyof typeof actionResponses] || 
-                  'I\'ve processed your marketing request.',
-          isMarketingResponse: true,
-          sentiment: {
-            compound: 0.42,
-            pos: 0.65,
-            neu: 0.30,
-            neg: 0.05
-          },
-          keywords: [
-            ['marketing', 10],
-            ['strategy', 8],
-            ['customers', 7],
-            ['campaign', 6],
-            ['promotion', 5],
-            ['social media', 4],
-            ['engagement', 3]
-          ]
-        }]);
-        
-        setIsLoading(false);
-      }, 1500);
-    } catch (error) {
-      console.error('Error executing marketing action:', error);
-      setError('Failed to execute marketing action');
-      setIsLoading(false);
-    }
-  };
-
   return {
     messages,
     isLoading,
@@ -160,8 +104,7 @@ const useAI = () => {
     availableProviders: ['cloudflare', 'ollama'],
     sendMessage,
     setActiveProvider: () => {},
-    clearMessages,
-    handleMarketingAction
+    clearMessages
   };
 };
 
@@ -181,8 +124,7 @@ export const UnifiedAIChat: React.FC<UnifiedAIChatProps> = ({
     availableProviders,
     sendMessage,
     setActiveProvider,
-    clearMessages,
-    handleMarketingAction
+    clearMessages
   } = useAI();
 
   const [input, setInput] = useState<string>('');

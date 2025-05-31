@@ -40,7 +40,7 @@ export default function PlacePage() {
           change={{
             value: 12.7,
             period: 'vs last week',
-            type: 'increase'
+            trend: 'up' as const
           }}
           icon={Eye}
           variant="success"
@@ -53,7 +53,7 @@ export default function PlacePage() {
           change={{
             value: 8.2,
             period: 'vs last month',
-            type: 'increase'
+            trend: 'up' as const
           }}
           icon={Target}
           variant="success"
@@ -66,7 +66,7 @@ export default function PlacePage() {
           change={{
             value: 3.4,
             period: 'vs last quarter',
-            type: 'decrease'
+            trend: 'down' as const
           }}
           icon={Building}
           variant="warning"
@@ -79,7 +79,7 @@ export default function PlacePage() {
           change={{
             value: 0.5,
             period: 'vs last assessment',
-            type: 'increase'
+            trend: 'up' as const
           }}
           icon={Star}
           variant="success"

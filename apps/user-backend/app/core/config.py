@@ -5,7 +5,7 @@ Configuration settings for BiteBase User Backend
 import os
 from typing import List, Optional
 from pydantic_settings import BaseSettings
-from pydantic import validator
+from pydantic import field_validator
 
 
 class Settings(BaseSettings):
@@ -24,23 +24,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
 
     # CORS
-    ALLOWED_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "https://bitebase.com",
-        "https://staff.bitebase.com",
-        "https://tools.bitebase.com",
-        "https://workflows.bitebase.com",
-        "https://tasks.bitebase.com"
-    ]
-
-    ALLOWED_HOSTS: List[str] = [
-        "localhost",
-        "127.0.0.1",
-        "bitebase.com",
-        "api.bitebase.com",
-        "*.bitebase.com"
-    ]
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:12000,https://work-1-sriexewjfolcezbr.prod-runtime.all-hands.dev,https://work-2-sriexewjfolcezbr.prod-runtime.all-hands.dev"
+    ALLOWED_HOSTS: str = "localhost,127.0.0.1,0.0.0.0,work-1-sriexewjfolcezbr.prod-runtime.all-hands.dev,work-2-sriexewjfolcezbr.prod-runtime.all-hands.dev"
 
     # Database
     # Default local database URL (used for development)
@@ -89,21 +74,17 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "json"
 
-    @validator("ALLOWED_ORIGINS", pre=True)
-    def assemble_cors_origins(cls, v):
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+    def get_allowed_origins(self) -> List[str]:
+        """Get ALLOWED_ORIGINS as a list"""
+        if isinstance(self.ALLOWED_ORIGINS, str):
+            return [i.strip() for i in self.ALLOWED_ORIGINS.split(",")]
+        return self.ALLOWED_ORIGINS
 
-    @validator("ALLOWED_HOSTS", pre=True)
-    def assemble_allowed_hosts(cls, v):
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+    def get_allowed_hosts(self) -> List[str]:
+        """Get ALLOWED_HOSTS as a list"""
+        if isinstance(self.ALLOWED_HOSTS, str):
+            return [i.strip() for i in self.ALLOWED_HOSTS.split(",")]
+        return self.ALLOWED_HOSTS
 
     class Config:
         env_file = ".env"

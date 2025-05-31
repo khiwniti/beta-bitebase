@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@bitebase/ui": "workspace:*",
+    "@bitebase/ui": "file:../../packages/ui",
     "@clerk/nextjs": "^4.29.1",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",

@@ -1,105 +1,147 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from "@bitebase/ui"
 import {
   BarChart2,
+  MapPin,
   TrendingUp,
   Users,
   DollarSign,
+  Star,
   Target,
-  Activity,
+  Utensils,
+  MessageCircle,
+  Send,
+  RefreshCw,
+  Download,
   Plus,
   FileText,
-  Send,
   Map,
-  Eye,
-  Award,
-  ShoppingBag,
-  Star,
-  AlertTriangle,
-  CheckCircle,
-  Info
+  Calendar
 } from "lucide-react"
 import { useAuth } from "../../contexts/AuthContext"
-import PageWrapper from "../../components/layout/PageWrapper"
-import AnalysisCard from "../../components/ui/analysis-card"
-import { MetricCard as EnhancedMetricCard } from "../../components/ui/metric-card"
-import { DataTable } from "../../components/ui/data-table"
+import DashboardLayout from "../../components/layout/DashboardLayout"
+import { 
+  DashboardGrid, 
+  DashboardSection, 
+  MetricCard, 
+  ChartCard, 
+  InsightCard,
+  ActivityItem 
+} from "../../components/dashboard/DashboardGrid"
 import { ChartContainer, SimpleLineChart, SimpleBarChart } from "../../components/ui/chart-container"
-import { DataPlaceholder, MetricPlaceholder, ChartPlaceholder, TablePlaceholder } from "../../components/ui/DataPlaceholder"
 import { tourUtils } from "../../utils/tourUtils"
-import { TourDemo } from "../../components/tour/TourDemo"
 
 // Placeholder data structure - will be replaced with real API data
 const placeholderMetrics = {
-  revenue: { value: null, change: null, period: 'vs last month' },
-  customers: { value: null, change: null, period: 'vs last month' },
-  avgOrder: { value: null, change: null, period: 'vs last month' },
-  satisfaction: { value: null, change: null, period: 'vs last month' },
-  footTraffic: { value: null, change: null, period: 'vs yesterday' },
-  conversionRate: { value: null, change: null, period: 'vs last week' },
-  marketShare: { value: null, change: null, period: 'vs last quarter' },
-  competitorGap: { value: null, change: null, period: 'vs last quarter' }
+  revenue: { 
+    value: "$12,450", 
+    change: { value: 8.2, period: 'vs last month', trend: 'up' as const }
+  },
+  customers: { 
+    value: "1,234", 
+    change: { value: 12.5, period: 'vs last month', trend: 'up' as const }
+  },
+  avgOrder: { 
+    value: "$45.60", 
+    change: { value: 3.1, period: 'vs last month', trend: 'up' as const }
+  },
+  satisfaction: { 
+    value: "4.8", 
+    change: { value: 0.2, period: 'vs last month', trend: 'up' as const }
+  },
+  footTraffic: { 
+    value: "2,456", 
+    change: { value: 15.3, period: 'vs yesterday', trend: 'up' as const }
+  },
+  conversionRate: { 
+    value: "3.2%", 
+    change: { value: 0.8, period: 'vs last week', trend: 'up' as const }
+  },
+  marketShare: { 
+    value: "12.5%", 
+    change: { value: 1.2, period: 'vs last quarter', trend: 'up' as const }
+  },
+  competitorGap: { 
+    value: "8.3%", 
+    change: { value: -0.5, period: 'vs last quarter', trend: 'down' as const }
+  }
 }
 
-const mockRecentActivity = [
-  { id: 1, action: 'New competitor analysis completed', time: '2 hours ago', type: 'analysis', icon: BarChart2 },
-  { id: 2, action: 'Market report generated for Sukhumvit', time: '4 hours ago', type: 'report', icon: FileText },
-  { id: 3, action: 'Price optimization recommendations', time: '6 hours ago', type: 'optimization', icon: DollarSign },
-  { id: 4, action: 'Customer feedback analysis', time: '8 hours ago', type: 'feedback', icon: Users },
-  { id: 5, action: 'Location scout report: Silom area', time: '1 day ago', type: 'location', icon: Map }
-]
-
-const mockTopCompetitors = [
-  { name: 'Bella Vista', distance: '0.3 mi', rating: 4.2, priceRange: '$$', marketShare: 18.5, trend: 'up' },
-  { name: 'Green Garden', distance: '0.5 mi', rating: 4.0, priceRange: '$$$', marketShare: 14.2, trend: 'stable' },
-  { name: 'Urban Bites', distance: '0.7 mi', rating: 3.8, priceRange: '$', marketShare: 12.8, trend: 'down' },
-  { name: 'Fusion Kitchen', distance: '0.9 mi', rating: 4.1, priceRange: '$$', marketShare: 11.3, trend: 'up' }
-]
-
+// Mock data for insights
 const mockInsights = [
   {
     id: 1,
-    type: 'opportunity',
-    title: 'High-Traffic Location Identified',
-    description: 'Downtown area shows 40% higher foot traffic during lunch hours',
-    impact: 'High',
-    action: 'Consider opening a second location',
+    type: 'opportunity' as const,
+    title: 'Peak Hour Optimization',
+    description: 'Lunch rush shows 23% higher demand than capacity',
+    impact: 'High' as const,
+    action: 'Optimize staffing',
     priority: 1,
     icon: TrendingUp
   },
   {
     id: 2,
-    type: 'warning',
+    type: 'warning' as const,
     title: 'Competitor Price Drop',
-    description: 'Main competitor reduced lunch prices by 15%',
-    impact: 'Medium',
-    action: 'Review pricing strategy',
+    description: 'Main competitor reduced prices by 15%',
+    impact: 'Medium' as const,
+    action: 'Review pricing',
     priority: 2,
-    icon: AlertTriangle
+    icon: Target
   },
   {
     id: 3,
-    type: 'success',
-    title: 'Menu Item Performance',
-    description: 'New seasonal salad increased sales by 25%',
-    impact: 'Medium',
-    action: 'Expand seasonal offerings',
+    type: 'info' as const,
+    title: 'Menu Performance',
+    description: 'Top 3 items generate 60% of revenue',
+    impact: 'Low' as const,
+    action: 'Promote variety',
     priority: 3,
-    icon: CheckCircle
+    icon: Utensils
+  }
+]
+
+// Mock recent activity data
+const mockRecentActivity = [
+  {
+    id: 1,
+    action: 'Market analysis completed for downtown location',
+    time: '2 hours ago',
+    type: 'analysis' as const,
+    icon: BarChart2
+  },
+  {
+    id: 2,
+    action: 'New competitor detected: "Fresh Bites Cafe"',
+    time: '4 hours ago',
+    type: 'feedback' as const,
+    icon: Target
+  },
+  {
+    id: 3,
+    action: 'Weekly performance report generated',
+    time: '1 day ago',
+    type: 'report' as const,
+    icon: FileText
   },
   {
     id: 4,
-    type: 'info',
-    title: 'Peak Hours Analysis',
-    description: 'Lunch rush extended by 30 minutes on weekdays',
-    impact: 'Low',
-    action: 'Adjust staffing schedule',
-    priority: 4,
-    icon: Info
+    action: 'Customer satisfaction survey completed',
+    time: '2 days ago',
+    type: 'feedback' as const,
+    icon: Users
   }
+]
+
+// Mock competitor data
+const mockTopCompetitors = [
+  { name: 'Bella Vista', distance: '0.2 mi', rating: 4.5, priceRange: '$$', marketShare: 18, trend: 'up' },
+  { name: 'Corner Cafe', distance: '0.4 mi', rating: 4.2, priceRange: '$', marketShare: 15, trend: 'down' },
+  { name: 'Urban Eats', distance: '0.6 mi', rating: 4.7, priceRange: '$$$', marketShare: 22, trend: 'up' },
+  { name: 'Quick Bites', distance: '0.3 mi', rating: 3.9, priceRange: '$', marketShare: 12, trend: 'stable' }
 ]
 
 export default function DashboardPage() {
@@ -112,121 +154,40 @@ export default function DashboardPage() {
   const { user } = useAuth()
   const router = useRouter()
 
-  // Initialize chat with welcome message
   useEffect(() => {
-    if (!user) {
-      router.push('/auth')
-      return
-    }
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
 
-    setChatMessages([
-      {
-        id: '1',
-        message: "Welcome! I'm your BiteBase AI assistant. I can help you with market research, competitor analysis, demographic insights, and location scoring. What would you like to explore today?",
-        isUser: false,
-        timestamp: new Date().toLocaleTimeString()
-      }
-    ])
+    return () => clearTimeout(timer)
+  }, [])
 
-    setIsLoading(false)
-
-    // Debug: Log tour state on page load
-    console.log('Dashboard loaded. Tour state:', tourUtils.getTourState())
-  }, [user, router])
-
-  // AI Response function
-  const getAIResponse = async (query: string): Promise<string> => {
-    try {
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://bitebase-ai-agents-production.bitebase.workers.dev'
-
-      const response = await fetch(`${aiAgentsUrl}/research`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: 'Bangkok, Thailand',
-          cuisine_type: 'general consultation',
-          additional_context: {
-            message: query,
-            conversation_type: 'dashboard_chat'
-          }
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        return data.analysis || data.message || "I've analyzed your query and can provide detailed insights. Please let me know what specific aspect you'd like me to focus on."
-      } else {
-        throw new Error('AI service unavailable')
-      }
-    } catch (error) {
-      console.error('Error getting AI response:', error)
-      return "I'm here to help with your restaurant business intelligence needs! I can provide insights on market opportunities, competitor analysis, demographic data, location scoring, menu optimization, and marketing strategies. What specific area would you like to explore?"
-    }
-  }
-
-  // Send chat message
-  const sendChatMessage = () => {
+  const handleSendMessage = async () => {
     if (!chatMessage.trim()) return
 
-    const userMessage = chatMessage
-
-    setChatMessages(prev => [...prev, {
+    const userMessage = {
       id: Date.now().toString(),
-      message: userMessage,
+      message: chatMessage,
       isUser: true,
-      timestamp: 'Just now'
-    }])
+      timestamp: new Date().toLocaleTimeString()
+    }
 
+    setChatMessages(prev => [...prev, userMessage])
     setChatMessage('')
     setIsTyping(true)
 
-    getAIResponse(userMessage).then(aiResponse => {
-      setChatMessages(prev => [...prev, {
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse = {
         id: (Date.now() + 1).toString(),
-        message: aiResponse,
+        message: `Based on your question about "${chatMessage}", I recommend analyzing your location's foot traffic patterns and competitor pricing strategies. Would you like me to run a detailed market analysis for your area?`,
         isUser: false,
-        timestamp: 'Just now'
-      }])
+        timestamp: new Date().toLocaleTimeString()
+      }
+      setChatMessages(prev => [...prev, aiResponse])
       setIsTyping(false)
-    }).catch(() => {
-      setChatMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        message: "Sorry, I'm having trouble connecting to the AI service. Please try again.",
-        isUser: false,
-        timestamp: 'Just now'
-      }])
-      setIsTyping(false)
-    })
-  }
-
-  // Send suggestion
-  const sendSuggestion = (suggestion: string) => {
-    setChatMessages(prev => [...prev, {
-      id: Date.now().toString(),
-      message: suggestion,
-      isUser: true,
-      timestamp: 'Just now'
-    }])
-
-    setIsTyping(true)
-
-    getAIResponse(suggestion).then(aiResponse => {
-      setChatMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        message: aiResponse,
-        isUser: false,
-        timestamp: 'Just now'
-      }])
-      setIsTyping(false)
-    }).catch(() => {
-      setChatMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        message: "Sorry, I'm having trouble connecting to the AI service. Please try again.",
-        isUser: false,
-        timestamp: 'Just now'
-      }])
-      setIsTyping(false)
-    })
+    }, 2000)
   }
 
   if (isLoading) {
@@ -241,480 +202,367 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
-      {/* Debug Panel - Only show in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 right-4 z-50 bg-gray-800 text-white p-3 rounded-lg shadow-lg text-xs">
-          <div className="mb-2 font-semibold">Tour Debug</div>
-          <div>State: {tourUtils.isTourDisabled() ? 'Disabled' : 'Enabled'}</div>
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={() => { tourUtils.disableTour(); window.location.reload() }}
-              className="bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-xs"
-            >
-              Disable Tour
-            </button>
-            <button
-              onClick={() => { tourUtils.enableTour(); window.location.reload() }}
-              className="bg-primary hover:bg-primary-600 px-2 py-1 rounded text-xs text-white"
-            >
-              Enable Tour
-            </button>
-          </div>
-        </div>
-      )}
-
-      <PageWrapper
-        title="Market Intelligence Dashboard"
-        description="Get AI-powered insights for your restaurant business decisions"
-        actions={[
-          {
-            label: "New Analysis",
-            onClick: () => router.push('/market-analysis'),
-            icon: <Plus className="w-4 h-4" />
-          },
-          {
-            label: "Generate Report",
-            onClick: () => router.push('/reports'),
-            variant: "outline",
-            icon: <FileText className="w-4 h-4" />
-          }
-        ]}
+    <DashboardLayout
+      pageTitle="Market Intelligence Dashboard"
+      pageDescription="Get AI-powered insights for your restaurant business decisions"
+      headerActions={[
+        {
+          label: "Export Report",
+          icon: <Download className="h-4 w-4" />,
+          onClick: () => console.log('Export report'),
+          variant: 'outline'
+        },
+        {
+          label: "New Analysis",
+          icon: <Plus className="h-4 w-4" />,
+          onClick: () => router.push('/market-analysis'),
+          variant: 'default'
+        }
+      ]}
+    >
+      {/* Key Metrics Overview */}
+      <DashboardSection 
+        title="Key Performance Metrics" 
+        description="Monitor your restaurant's vital statistics"
+        actions={
+          <Button variant="outline" size="sm" onClick={() => router.push('/reports')}>
+            <FileText className="w-4 h-4 mr-2" />
+            View Reports
+          </Button>
+        }
       >
-        {/* Enhanced Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Total Revenue</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Connect POS for data</div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <DashboardGrid>
+          <MetricCard
+            title="Monthly Revenue"
+            value={placeholderMetrics.revenue.value}
+            change={placeholderMetrics.revenue.change}
+            icon={<DollarSign className="h-5 w-5" />}
+          />
+          
+          <MetricCard
+            title="Customer Count"
+            value={placeholderMetrics.customers.value}
+            change={placeholderMetrics.customers.change}
+            icon={<Users className="h-5 w-5" />}
+          />
+          
+          <MetricCard
+            title="Average Order"
+            value={placeholderMetrics.avgOrder.value}
+            change={placeholderMetrics.avgOrder.change}
+            icon={<Utensils className="h-5 w-5" />}
+          />
+          
+          <MetricCard
+            title="Satisfaction Score"
+            value={placeholderMetrics.satisfaction.value}
+            change={placeholderMetrics.satisfaction.change}
+            icon={<Star className="h-5 w-5" />}
+          />
+          
+          <MetricCard
+            title="Foot Traffic"
+            value={placeholderMetrics.footTraffic.value}
+            change={placeholderMetrics.footTraffic.change}
+            icon={<MapPin className="h-5 w-5" />}
+          />
+          
+          <MetricCard
+            title="Conversion Rate"
+            value={placeholderMetrics.conversionRate.value}
+            change={placeholderMetrics.conversionRate.change}
+            icon={<TrendingUp className="h-5 w-5" />}
+          />
+          
+          <MetricCard
+            title="Market Share"
+            value={placeholderMetrics.marketShare.value}
+            change={placeholderMetrics.marketShare.change}
+            icon={<Target className="h-5 w-5" />}
+          />
+          
+          <MetricCard
+            title="Competitive Gap"
+            value={placeholderMetrics.competitorGap.value}
+            change={placeholderMetrics.competitorGap.change}
+            icon={<BarChart2 className="h-5 w-5" />}
+          />
+        </DashboardGrid>
+      </DashboardSection>
 
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Users className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Customer Count</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Connect POS for data</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <ShoppingBag className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Average Order Value</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Connect POS for data</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Award className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Customer Satisfaction</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Connect POS for data</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Secondary Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Eye className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Daily Foot Traffic</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Location data needed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Target className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Conversion Rate</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Analytics needed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <BarChart2 className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Market Share</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Market analysis needed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-white shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Activity className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Competitive Gap</span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-gray-400">--</div>
-                  <div className="text-sm text-gray-400">Competitor data needed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* AI Chat Assistant */}
-                  <div className="lg:col-span-2">
-            <div className="rounded-lg bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="flex flex-col space-y-1.5 p-6 pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold tracking-tight text-lg flex items-center">AI Market Assistant</h3>
-                    <p className="text-sm text-gray-500 mt-1">Get instant insights about market opportunities, competitors, and demographics</p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setChatMessages([])}
-                      className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
-                    >
-                      Clear Chat
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6 pt-0">
-                <div className="space-y-4" data-tour="ai-chat">
-                  {/* Chat Messages */}
-                  <div className="h-96 overflow-y-auto space-y-4 p-4 bg-gray-50 rounded-lg">
-                    {chatMessages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                            msg.isUser
-                              ? 'bg-blue-600 text-white rounded-lg'
-                              : 'bg-white text-gray-900 border border-gray-200'
-                          }`}
-                        >
-                          <p className="text-sm">{msg.message}</p>
-                          <p className={`text-xs mt-1 ${msg.isUser ? 'text-blue-100' : 'text-gray-500'}`}>
-                            {msg.timestamp}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-
-                    {isTyping && (
-                      <div className="flex justify-start">
-                        <div className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-lg">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Quick Suggestions */}
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Analyze Bangkok market opportunities",
-                      "Compare competitor pricing",
-                      "Show demographic insights",
-                      "Location scoring analysis"
-                    ].map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        onClick={() => sendSuggestion(suggestion)}
-                        className="inline-flex items-center justify-center whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 text-xs"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Chat Input */}
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && sendChatMessage()}
-                      placeholder="Ask about market opportunities, competitors, demographics..."
-                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
-                    />
-                    <button
-                      onClick={sendChatMessage}
-                      disabled={!chatMessage.trim() || isTyping}
-                      className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2"
-                    >
-                      <Send className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions Sidebar */}
-                  <div className="space-y-6">
-            <AnalysisCard
-              title="Quick Actions"
-              description="Jump to key features"
-            >
-              <div className="space-y-3">
-                <Button
-                  onClick={() => router.push('/market-analysis')}
-                  className="w-full justify-start btn-primary"
-                  data-tour="map-analysis"
-                >
-                  <Map className="w-4 h-4 mr-2" />
-                  Analyze Location
-                </Button>
-                <Button
-                  onClick={() => router.push('/restaurant-setup')}
-                  variant="outline"
-                  className="w-full justify-start"
-                  data-tour="restaurant-setup"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Setup Restaurant
-                        </Button>
-                <Button
-                  onClick={() => router.push('/reports')}
-                  variant="outline"
-                  className="w-full justify-start"
-                  data-tour="reports"
-                >
-                          <FileText className="w-4 h-4 mr-2" />
-                          Generate Report
-                        </Button>
-              </div>
-            </AnalysisCard>
-
-            <AnalysisCard
-              title="AI Insights"
-              description="Latest trends and opportunities"
-            >
-              <div className="space-y-4">
-                {mockInsights.map((insight) => {
-                  const IconComponent = insight.icon
-                  const bgColor = insight.type === 'opportunity' ? 'bg-green-50 border-green-200' :
-                                 insight.type === 'warning' ? 'bg-amber-50 border-amber-200' :
-                                 insight.type === 'success' ? 'bg-blue-50 border-blue-200' :
-                                 'bg-gray-50 border-gray-200'
-                  const textColor = insight.type === 'opportunity' ? 'text-green-800' :
-                                   insight.type === 'warning' ? 'text-amber-800' :
-                                   insight.type === 'success' ? 'text-blue-800' :
-                                   'text-gray-800'
-                  const iconColor = insight.type === 'opportunity' ? 'text-green-600' :
-                                   insight.type === 'warning' ? 'text-amber-600' :
-                                   insight.type === 'success' ? 'text-blue-600' :
-                                   'text-gray-600'
-
-                  return (
-                    <div key={insight.id} className={`p-3 rounded-lg border ${bgColor}`}>
-                      <div className="flex items-center mb-2">
-                        <IconComponent className={`w-4 h-4 mr-2 ${iconColor}`} />
-                        <span className={`text-sm font-medium ${textColor}`}>{insight.title}</span>
-                        <span className="ml-auto text-xs text-gray-500">{insight.impact} Impact</span>
-                      </div>
-                      <p className={`text-sm ${textColor.replace('800', '700')}`}>{insight.description}</p>
-                      <p className="text-xs text-gray-600 mt-1 font-medium">{insight.action}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            </AnalysisCard>
-            </div>
-        </div>
-
-        {/* Enhanced Analytics Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-          {/* Performance Chart */}
-          <ChartContainer
-            title="Revenue Trend"
-            subtitle="Monthly performance over the last 6 months"
-            chartType="line"
-            timeRange="Last 6 months"
-            actions={{
-              onExport: () => console.log('Export chart'),
-              onRefresh: () => console.log('Refresh data'),
-              onExpand: () => console.log('Expand chart')
-            }}
+      {/* Main Content Grid - 2 Sidebar Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* AI Chat Assistant */}
+        <div>
+          <ChartCard
+            title="AI Market Assistant"
           >
-            <SimpleLineChart data={[1, 2, 3, 4, 5, 6]} height={300} />
-          </ChartContainer>
+            <div className="space-y-4" data-tour="ai-chat">
+              {/* Chat Messages */}
+              <div className="h-96 overflow-y-auto space-y-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                {chatMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        msg.isUser
+                          ? 'bg-blue-600 text-white rounded-lg'
+                          : 'bg-white text-gray-900 border border-gray-200'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.message}</p>
+                      <p className={`text-xs mt-1 ${msg.isUser ? 'text-blue-100' : 'text-gray-500'}`}>
+                        {msg.timestamp}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-lg">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {chatMessages.length === 0 && (
+                  <div className="text-center py-8">
+                    <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-gray-400 mb-2">Ask me anything about your restaurant business!</p>
+                    <p className="text-sm text-gray-400 dark:text-gray-500">Try: "How can I increase my revenue?" or "Analyze my location"</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Chat Input */}
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Ask about market trends, competitors, or business strategies..."
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  disabled={isTyping}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!chatMessage.trim() || isTyping}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </ChartCard>
+        </div>
+
+        {/* Quick Actions Sidebar */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h3>
+            <div className="space-y-3">
+              <Button
+                onClick={() => router.push('/market-analysis')}
+                className="w-full justify-start btn-primary"
+                data-tour="map-analysis"
+              >
+                <Map className="w-4 h-4 mr-2" />
+                Analyze Location
+              </Button>
+              <Button
+                onClick={() => router.push('/restaurant-setup')}
+                variant="outline"
+                className="w-full justify-start"
+                data-tour="restaurant-setup"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Setup Restaurant
+              </Button>
+              <Button
+                onClick={() => router.push('/reports')}
+                variant="outline"
+                className="w-full justify-start"
+                data-tour="reports"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Generate Report
+              </Button>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">AI Insights</h3>
+            <div className="space-y-3">
+              {mockInsights.map((insight) => (
+                <InsightCard
+                  key={insight.id}
+                  type={insight.type}
+                  title={insight.title}
+                  description={insight.description}
+                  impact={insight.impact}
+                  action={insight.action}
+                  priority={insight.priority}
+                  icon={<insight.icon className="h-5 w-5" />}
+                  onAction={() => {
+                    // Handle insight action based on type
+                    if (insight.type === 'opportunity') {
+                      router.push('/market-analysis')
+                    } else if (insight.type === 'warning') {
+                      router.push('/price')
+                    } else {
+                      router.push('/product')
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <DashboardSection 
+        title="Recent Activity" 
+        description="Latest actions and system updates"
+        actions={
+          <Button variant="outline" size="sm" onClick={() => router.push('/reports')}>
+            <FileText className="w-4 h-4 mr-2" />
+            View All
+          </Button>
+        }
+      >
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="p-6">
+            <div className="space-y-1">
+              {mockRecentActivity.map((activity) => (
+                <ActivityItem
+                  key={activity.id}
+                  action={activity.action}
+                  time={activity.time}
+                  type={activity.type}
+                  icon={<activity.icon className="h-4 w-4" />}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </DashboardSection>
+
+      {/* Analytics Charts */}
+      <DashboardSection 
+        title="Performance Analytics" 
+        description="Track your business metrics and trends"
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Performance Chart */}
+          <ChartCard
+            title="Revenue Trend"
+            timeRange="7d"
+            onTimeRangeChange={(range) => console.log('Time range changed:', range)}
+          >
+            <div className="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="text-center">
+                <BarChart2 className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">Connect POS system to view revenue trends</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => router.push('/settings/integrations')}
+                >
+                  Connect Now
+                </Button>
+              </div>
+            </div>
+          </ChartCard>
 
           {/* Market Share Chart */}
-          <ChartContainer
+          <ChartCard
             title="Market Share Analysis"
-            subtitle="Competitive positioning in local market"
-            chartType="pie"
-            timeRange="Current quarter"
-            actions={{
-              onExport: () => console.log('Export chart'),
-              onRefresh: () => console.log('Refresh data')
-            }}
+            timeRange="30d"
+            onTimeRangeChange={(range) => console.log('Time range changed:', range)}
           >
-            <SimpleBarChart data={mockTopCompetitors} height={300} />
-          </ChartContainer>
-        </div>
-
-        {/* Competitor Analysis Table */}
-        <div className="mt-8">
-          <DataTable
-            title="Competitor Analysis"
-            data={mockTopCompetitors}
-            columns={[
-              { key: 'name', title: 'Restaurant', sortable: true },
-              { key: 'distance', title: 'Distance', sortable: true },
-              {
-                key: 'rating',
-                title: 'Rating',
-                sortable: true,
-                render: (value: number) => (
-                  <div className="flex items-center">
-                    <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                    {value}
-                  </div>
-                )
-              },
-              { key: 'priceRange', title: 'Price Range', sortable: true },
-              {
-                key: 'marketShare',
-                title: 'Market Share',
-                sortable: true,
-                render: (value: number) => `${value}%`
-              },
-              {
-                key: 'trend',
-                title: 'Trend',
-                render: (value: string) => (
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    value === 'up' ? 'bg-green-100 text-green-800' :
-                    value === 'down' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {value === 'up' ? '↗' : value === 'down' ? '↘' : '→'} {value}
-                  </span>
-                )
-              }
-            ]}
-            searchable={true}
-            exportable={true}
-            pagination={true}
-            pageSize={5}
-          />
-        </div>
-
-        {/* Recent Activity Feed */}
-        <div className="mt-8">
-          <AnalysisCard
-            title="Recent Activity"
-            description="Latest system activities and updates"
-          >
-            <div className="space-y-4">
-              {mockRecentActivity.map((activity) => {
-                const IconComponent = activity.icon
-                return (
-                  <div key={activity.id} className="flex items-start p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                      <IconComponent className="w-4 h-4 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
-                    </div>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      activity.type === 'analysis' ? 'bg-blue-100 text-blue-800' :
-                      activity.type === 'report' ? 'bg-green-100 text-green-800' :
-                      activity.type === 'optimization' ? 'bg-purple-100 text-purple-800' :
-                      activity.type === 'feedback' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {activity.type}
-                    </span>
-                  </div>
-                )
-              })}
+            <div className="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="text-center">
+                <Target className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">Run market analysis to view competitive positioning</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => router.push('/market-analysis')}
+                >
+                  Analyze Market
+                </Button>
+              </div>
             </div>
-          </AnalysisCard>
+          </ChartCard>
         </div>
+      </DashboardSection>
 
-        {/* Tour Demo - Only show in development */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-8">
-            <TourDemo />
+      {/* Competitor Analysis */}
+      <DashboardSection 
+        title="Competitor Analysis" 
+        description="Monitor your competition and market positioning"
+        actions={
+          <Button variant="outline" size="sm" onClick={() => router.push('/market-analysis')}>
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Full Analysis
+          </Button>
+        }
+      >
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+          <div className="p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-gray-100">Restaurant</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-gray-100">Distance</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-gray-100">Rating</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-gray-100">Price Range</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-gray-100">Market Share</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-gray-100">Trend</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockTopCompetitors.map((competitor, index) => (
+                    <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">{competitor.name}</td>
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{competitor.distance}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                          <span className="text-gray-900 dark:text-gray-100">{competitor.rating}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-400">{competitor.priceRange}</td>
+                      <td className="py-3 px-4 text-gray-900 dark:text-gray-100">{competitor.marketShare}%</td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          competitor.trend === 'up' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                          competitor.trend === 'down' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                        }`}>
+                          {competitor.trend === 'up' ? '↗' : competitor.trend === 'down' ? '↘' : '→'} {competitor.trend}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        )}
-      </PageWrapper>
-    </>
+        </div>
+      </DashboardSection>
+    </DashboardLayout>
   )
 }

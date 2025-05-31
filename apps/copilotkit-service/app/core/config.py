@@ -3,7 +3,7 @@ Configuration settings for CopilotKit Service
 """
 
 from typing import List
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -23,18 +23,12 @@ class Settings(BaseSettings):
     USER_BACKEND_URL: str = "http://localhost:8000"
     
     # CORS
-    ALLOWED_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://localhost:3003",
-        "http://localhost:3004",
-        "https://bitebase.com",
-        "https://staff.bitebase.com",
-        "https://tools.bitebase.com",
-        "https://workflows.bitebase.com",
-        "https://tasks.bitebase.com"
-    ]
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:12000,https://work-1-sriexewjfolcezbr.prod-runtime.all-hands.dev,https://work-2-sriexewjfolcezbr.prod-runtime.all-hands.dev"
+    
+    @property
+    def allowed_origins_list(self) -> List[str]:
+        """Parse ALLOWED_ORIGINS string into list"""
+        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
     
     # API Keys
     OPENAI_API_KEY: str = ""

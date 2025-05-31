@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "../../lib/utils"
-import { Card, CardContent, CardHeader, CardTitle } from "./apps/restaurant-setup/card"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 
 export interface ChartContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string

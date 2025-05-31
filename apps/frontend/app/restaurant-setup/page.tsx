@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../contexts/AuthContext"
 import { useLanguage } from "../../contexts/LanguageContext"
-import { MainLayout } from "../../components/layout/MainLayout"
+import { DashboardLayout } from "../../components/layout/DashboardLayout"
+import { MetricCard, ChartCard, InsightCard, DashboardSection } from "../../components/dashboard/DashboardGrid"
 import ProductionMapComponent from "../../components/geospatial/ProductionMapComponent"
 import {
   Search,
@@ -222,19 +223,21 @@ export default function RestaurantSetupPage() {
         setLanguage(detectedLang)
       }
 
-      // Call our deployed AI agents worker directly
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://bitebase-ai-agents-production.bitebase.workers.dev'
+      // Call our local CopilotKit service
+      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'http://localhost:8001'
 
-      const response = await fetch(`${aiAgentsUrl}/research`, {
+      const response = await fetch(`${aiAgentsUrl}/copilotkit/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          location: 'General consultation',
-          cuisine_type: 'restaurant planning',
-          additional_context: {
-            message: userInput,
+          message: userInput,
+          user_id: 'restaurant-manager',
+          session_id: 'restaurant-setup-session',
+          context: {
+            location: 'General consultation',
+            cuisine_type: 'restaurant planning',
             language: detectedLang,
             conversationHistory: messages.slice(-5).map(msg => ({
               role: msg.sender === 'user' ? 'user' : 'assistant',
@@ -254,8 +257,8 @@ export default function RestaurantSetupPage() {
         throw new Error(data.message || 'AI service error')
       }
 
-      // Return the analysis from our AI worker
-      return data.analysis || data.message || 'AI response received successfully'
+      // Return the response from CopilotKit service
+      return data.response || data.message || 'AI response received successfully'
     } catch (error) {
       console.error('Error getting AI response:', error)
 
@@ -289,20 +292,22 @@ export default function RestaurantSetupPage() {
     setSelectedLocation(newLocation)
 
     try {
-      // Call our deployed AI agents worker for location analysis
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://bitebase-ai-agents-production.bitebase.workers.dev'
+      // Call our local CopilotKit service for location analysis
+      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'http://localhost:8001'
 
-      const response = await fetch(`${aiAgentsUrl}/research`, {
+      const response = await fetch(`${aiAgentsUrl}/copilotkit/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          location: `${address} (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
-          cuisine_type: 'location analysis',
-          additional_context: {
+          message: `Analyze this location for restaurant suitability: ${address} (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
+          user_id: 'restaurant-manager',
+          session_id: 'location-analysis-session',
+          context: {
             coordinates: { lat, lng },
-            analysis_type: 'location_suitability'
+            analysis_type: 'location_suitability',
+            address: address
           }
         })
       })
@@ -459,39 +464,35 @@ export default function RestaurantSetupPage() {
   }
 
   return (
-    <MainLayout
-      pageTitle="Restaurant Setup"
-      pageDescription="AI-powered market research and location analysis for your restaurant"
-      showSidebar={true}
-      showWelcomeBanner={false}
-      showNavbar={true}
-    >
-      {/* Breadcrumb and Status */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-2 text-sm">
-          <Home className="w-4 h-4 text-gray-400" />
-          <ChevronRight className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-600">Market Research</span>
-          <ChevronRight className="w-4 h-4 text-gray-400" />
-          <span className="text-green-600 font-medium">Market Analysis</span>
-        </div>
+    <DashboardLayout>
+      <div className="space-y-8">
+        {/* Page Header */}
+        <DashboardSection
+          title="Restaurant Setup"
+          description="AI-powered market research and location analysis for your restaurant"
+          actions={[
+            {
+              label: "Save Progress",
+              icon: <Save className="h-4 w-4" />,
+              onClick: () => console.log('Save progress')
+            }
+          ]}
+        />
 
-        <div className="hidden lg:flex items-center space-x-4 text-sm">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span className="text-gray-600">Analyzing Market Data</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-            <span className="text-gray-600">AI Assistant Active</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
-        {/* Map Section - Takes up 2/3 of the space */}
-        <div className="lg:col-span-2 relative bg-white rounded-lg shadow-sm border overflow-hidden">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+          {/* Map Section */}
+          <ChartCard
+            title="Interactive Location Map"
+            actions={[
+              {
+                label: "Fullscreen",
+                icon: <Search className="h-4 w-4" />,
+                onClick: () => console.log('Fullscreen map')
+              }
+            ]}
+          >
+            <div className="relative h-full overflow-hidden">
           {/* Git Panel Button */}
           <button 
             onClick={() => setShowGitPanel(!showGitPanel)}
@@ -789,43 +790,22 @@ export default function RestaurantSetupPage() {
               </div>
             )}
           </MapboxMap>
-        </div>
-
-        {/* AI Assistant Panel */}
-        <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border flex flex-col">
-          {/* Panel Header */}
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <Bot className="w-4 h-4 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">BiteBase AI</h3>
-                <div className="flex items-center space-x-2">
-                  <p className="text-xs text-gray-500">
-                    {language === 'en' ? 'Market Research Assistant' : 'ผู้ช่วยวิจัยตลาด'}
-                  </p>
-                  <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-                    {language.toUpperCase()}
-                  </span>
-                </div>
-              </div>
             </div>
+          </ChartCard>
 
-            <div className="flex items-center justify-between mt-3">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-xs text-gray-600">Online</span>
-              </div>
-              <button
-                onClick={() => setLanguage(language === 'en' ? 'th' : 'en')}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded"
-                title={language === 'en' ? 'Switch to Thai' : 'Switch to English'}
-              >
-                <Languages className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+          {/* AI Assistant Panel */}
+          <ChartCard
+            title="BiteBase AI Assistant"
+            actions={[
+              {
+                label: "Clear Chat",
+                icon: <Bot className="h-4 w-4" />,
+                onClick: () => setMessages([])
+              }
+            ]}
+          >
+            <div className="flex flex-col h-full">
+
 
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -916,8 +896,10 @@ export default function RestaurantSetupPage() {
               </button>
             </div>
           </div>
+            </div>
+          </ChartCard>
         </div>
       </div>
-    </MainLayout>
+    </DashboardLayout>
   )
 }

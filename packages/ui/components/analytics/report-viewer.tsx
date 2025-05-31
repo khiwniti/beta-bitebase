@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "../../lib/utils"
-import { Card, CardContent, CardHeader, CardTitle } from "./apps/restaurant-setup/card"
-import { Button } from "./apps/restaurant-setup/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { Button } from "../ui/button"
 
 export interface ReportSection {
   id: string

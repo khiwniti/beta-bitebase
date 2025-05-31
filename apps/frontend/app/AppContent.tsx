@@ -25,7 +25,7 @@ export default function AppContent({
   }, [])
 
   // Determine restaurant name from user data or use default
-  const restaurantName = user?.restaurantName || user?.displayName || "Your Restaurant"
+  const restaurantName = (user as any)?.restaurantName || user?.displayName || "Your Restaurant"
   const userName = user?.displayName || user?.email?.split('@')[0] || "Restaurant Manager"
 
   // Page title based on path

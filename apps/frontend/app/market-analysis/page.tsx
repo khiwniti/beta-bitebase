@@ -9,9 +9,8 @@ import { RestaurantMarker } from "../../components/geospatial/RestaurantMarker"
 import { AnalysisOverlay } from "../../components/geospatial/AnalysisOverlay"
 import { DemographicLayer } from "../../components/geospatial/DemographicLayer"
 import { MapPin, BarChart3, Users, DollarSign, TrendingUp, Filter, Download, RefreshCw, Eye, Target, Star, Clock } from "lucide-react"
-import { MainLayout } from "../../components/layout/MainLayout"
-import { PageWrapper, MetricCard, AnalysisCard } from "../../components/layout/PageWrapper"
-import { MetricCard as EnhancedMetricCard } from "../../components/ui/metric-card"
+import { DashboardLayout } from "../../components/layout/DashboardLayout"
+import { MetricCard, ChartCard, InsightCard, DashboardSection } from "../../components/dashboard/DashboardGrid"
 import { DataTable } from "../../components/ui/data-table"
 import { ChartContainer, SimpleLineChart, SimpleBarChart } from "../../components/ui/chart-container"
 
@@ -115,29 +114,41 @@ export default function MarketAnalysisPage() {
   const [showDemographics, setShowDemographics] = React.useState(false)
 
   return (
-    <MainLayout showWelcomeBanner={false}>
-      <PageWrapper
-        title="Market Analysis"
-        description="Comprehensive geospatial analysis for restaurant market research"
-        actions={[
-          {
-            label: "Save Analysis",
-            onClick: () => console.log('Save analysis'),
-            variant: "outline",
-            icon: <Download className="w-4 h-4" />
-          },
-          {
-            label: "Generate Report",
-            onClick: () => console.log('Generate report'),
-            icon: <BarChart3 className="w-4 h-4" />
+    <DashboardLayout>
+      <div className="space-y-8">
+        {/* Page Header */}
+        <DashboardSection
+          title="Market Analysis"
+          description="Comprehensive geospatial analysis for restaurant market research"
+          actions={
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => console.log('Save analysis')}>
+                <Download className="w-4 h-4 mr-2" />
+                Save Analysis
+              </Button>
+              <Button onClick={() => console.log('Generate report')}>
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Generate Report
+              </Button>
+            </div>
           }
-        ]}
-      >
+        >
+          <div></div>
+        </DashboardSection>
 
         {/* Analysis Controls */}
-        <AnalysisCard
+        <ChartCard
           title="Analysis Configuration"
-          description="Configure your market analysis parameters"
+          actions={[
+            {
+              label: "Reset",
+              icon: <RefreshCw className="h-4 w-4" />,
+              onClick: () => {
+                setSelectedLocation("Bangkok, Thailand")
+                setAnalysisType("heatmap")
+              }
+            }
+          ]}
         >
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
@@ -180,19 +191,26 @@ export default function MarketAnalysisPage() {
               </div>
             </div>
           </div>
-        </AnalysisCard>
+        </ChartCard>
 
         {/* Main Analysis View */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-2">
           {/* Map */}
-          <div className="lg:col-span-2">
-            <AnalysisCard
-              title="Interactive Market Map"
-              description="Geospatial visualization of market opportunities and competition"
-              loading={loading}
-              error={error}
-              data-tour="map-analysis"
-            >
+          <ChartCard
+            title="Interactive Market Map"
+            actions={[
+              {
+                label: "Fullscreen",
+                icon: <Eye className="h-4 w-4" />,
+                onClick: () => console.log('Fullscreen map')
+              },
+              {
+                label: "Export Map",
+                icon: <Download className="h-4 w-4" />,
+                onClick: () => console.log('Export map')
+              }
+            ]}
+          >
               <MapContainer
                 center={[13.7563, 100.5018]}
                 zoom={14}
@@ -254,125 +272,152 @@ export default function MarketAnalysisPage() {
                   </div>
                 ))}
               </MapContainer>
-            </AnalysisCard>
-          </div>
+            </ChartCard>
 
           {/* Analysis Results */}
           <div className="space-y-6">
-            {/* Enhanced Key Metrics */}
-            <div className="space-y-4">
-              <EnhancedMetricCard
-                title="Market Opportunity"
-                value="8.5/10"
-                change={{ value: 12, type: "increase", period: "vs avg" }}
-                icon={TrendingUp}
-                variant="success"
-                description="High potential for new restaurant"
-              />
-              <EnhancedMetricCard
-                title="Competition Density"
-                value="Medium"
-                icon={Users}
-                variant="warning"
-                description="3.2 restaurants per 1000 residents"
-              />
-              <EnhancedMetricCard
-                title="Foot Traffic"
-                value="15.2K"
-                change={{ value: 8, type: "increase", period: "daily avg" }}
-                icon={Eye}
-                variant="default"
-                description="Daily pedestrian count"
-              />
-              <EnhancedMetricCard
-                title="Average Rating"
-                value="4.2"
-                change={{ value: 0.3, type: "increase", period: "vs area avg" }}
-                icon={Star}
-                variant="success"
-                description="Competitor average rating"
-              />
-            </div>
+            {/* Key Metrics */}
+            <DashboardSection
+              title="Market Metrics"
+              description="Key performance indicators for this location"
+            >
+              <div className="grid grid-cols-1 gap-4">
+                <MetricCard
+                  title="Market Opportunity"
+                  value="8.5/10"
+                  change={{ value: 12, period: "vs last month", trend: "up" as const }}
+                  icon={<TrendingUp className="h-5 w-5" />}
+                  actionLabel="Analyze"
+                  onAction={() => console.log('Analyze opportunity')}
+                />
+                <MetricCard
+                  title="Competition Density"
+                  value="Medium"
+                  description="3.2 restaurants per 1000 residents"
+                  icon={<Users className="h-5 w-5" />}
+                  actionLabel="View Competitors"
+                  onAction={() => console.log('View competitors')}
+                />
+                <MetricCard
+                  title="Foot Traffic"
+                  value="15.2K"
+                  change={{ value: 8, period: "vs last month", trend: "up" as const }}
+                  description="Daily pedestrian count"
+                  icon={<Eye className="h-5 w-5" />}
+                  actionLabel="Traffic Analysis"
+                  onAction={() => console.log('Traffic analysis')}
+                />
+                <MetricCard
+                  title="Average Rating"
+                  value="4.2"
+                  change={{ value: 0.3, period: "vs last month", trend: "up" as const }}
+                  description="Competitor average rating"
+                  icon={<Star className="h-5 w-5" />}
+                  actionLabel="Rating Analysis"
+                  onAction={() => console.log('Rating analysis')}
+                />
+              </div>
+            </DashboardSection>
 
-            {/* Insights */}
-            <AnalysisCard
+            {/* AI Insights */}
+            <DashboardSection
               title="AI Insights"
               description="AI-powered market analysis insights"
             >
-              <div className="space-y-3">
-                <div className="flex items-start space-x-2 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="w-2 h-2 bg-green-600 rounded-full mt-2 animate-pulse"></div>
-                  <div className="text-sm">
-                    <p className="font-medium text-green-900">Optimal Location Identified</p>
-                    <p className="text-green-700">Sukhumvit Soi 11 shows highest potential</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-2 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="w-2 h-2 bg-green-600 rounded-full mt-2 animate-pulse"></div>
-                  <div className="text-sm">
-                    <p className="font-medium text-green-900">Cuisine Gap Analysis</p>
-                    <p className="text-green-700">Authentic Mexican cuisine underrepresented</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-2 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="w-2 h-2 bg-green-600 rounded-full mt-2 animate-pulse"></div>
-                  <div className="text-sm">
-                    <p className="font-medium text-green-900">Peak Hours</p>
-                    <p className="text-green-700">Lunch: 12-2pm, Dinner: 7-10pm, Late night: 10pm-1am</p>
-                  </div>
-                </div>
+              <div className="space-y-4">
+                <InsightCard
+                  type="opportunity"
+                  title="Optimal Location"
+                  description="Sukhumvit Soi 11 shows highest potential"
+                  priority={1}
+                  impact={"High" as const}
+                  action="View Details"
+                  onAction={() => console.log('View location details')}
+                  icon={<Target className="w-5 h-5" />}
+                />
+                <InsightCard
+                  type="opportunity"
+                  title="Cuisine Gap"
+                  description="Authentic Mexican cuisine underrepresented"
+                  priority={2}
+                  impact={"Medium" as const}
+                  action="Explore Gap"
+                  onAction={() => console.log('Explore cuisine gap')}
+                  icon={<TrendingUp className="w-5 h-5" />}
+                />
+                <InsightCard
+                  type="info"
+                  title="Peak Hours"
+                  description="Lunch: 12-2pm, Dinner: 7-10pm, Late night: 10pm-1am"
+                  priority={3}
+                  impact={"Low" as const}
+                  action="Optimize Schedule"
+                  onAction={() => console.log('Optimize schedule')}
+                  icon={<Clock className="w-5 h-5" />}
+                />
               </div>
-            </AnalysisCard>
-
-            {/* Actions */}
-            <div className="space-y-2">
-              <Button className="w-full btn-primary">
-                Generate Detailed Report
-              </Button>
-              <Button variant="outline" className="w-full btn-secondary">
-                Export Analysis Data
-              </Button>
-            </div>
+            </DashboardSection>
           </div>
         </div>
 
-        {/* Enhanced Analytics Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        {/* Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Market Trends Chart */}
-          <ChartContainer
+          <ChartCard
             title="Market Trends"
-            subtitle="Restaurant density and foot traffic over time"
-            chartType="line"
-            timeRange="Last 12 months"
-            actions={{
-              onExport: () => console.log('Export chart'),
-              onRefresh: () => fetchRestaurants(13.7563, 100.5018),
-              onExpand: () => console.log('Expand chart')
-            }}
+            actions={[
+              {
+                label: "Export",
+                icon: <Download className="h-4 w-4" />,
+                onClick: () => console.log('Export chart')
+              },
+              {
+                label: "Refresh",
+                icon: <RefreshCw className="h-4 w-4" />,
+                onClick: () => fetchRestaurants(13.7563, 100.5018)
+              }
+            ]}
           >
-            <SimpleLineChart data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]} height={300} />
-          </ChartContainer>
+            <div className="h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-gray-500 dark:text-gray-400">Restaurant density and foot traffic trends</p>
+            </div>
+          </ChartCard>
 
           {/* Competition Analysis Chart */}
-          <ChartContainer
+          <ChartCard
             title="Competition Analysis"
-            subtitle="Restaurant distribution by cuisine type"
-            chartType="bar"
-            timeRange="Current data"
-            actions={{
-              onExport: () => console.log('Export chart'),
-              onRefresh: () => fetchRestaurants(13.7563, 100.5018)
-            }}
+            actions={[
+              {
+                label: "Export",
+                icon: <Download className="h-4 w-4" />,
+                onClick: () => console.log('Export chart')
+              },
+              {
+                label: "Refresh",
+                icon: <RefreshCw className="h-4 w-4" />,
+                onClick: () => fetchRestaurants(13.7563, 100.5018)
+              }
+            ]}
           >
-            <SimpleBarChart data={restaurants.slice(0, 10)} height={300} />
-          </ChartContainer>
+            <div className="h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-gray-500 dark:text-gray-400">Restaurant distribution by cuisine type</p>
+            </div>
+          </ChartCard>
         </div>
 
         {/* Restaurant Analysis Table */}
         {restaurants.length > 0 && (
-          <div className="mt-8">
+          <ChartCard
+            title="Nearby Restaurants Analysis"
+            actions={[
+              {
+                label: "Export Data",
+                icon: <Download className="h-4 w-4" />,
+                onClick: () => console.log('Export restaurant data')
+              }
+            ]}
+          >
             <DataTable
-              title="Nearby Restaurants Analysis"
               data={restaurants.slice(0, 20)}
               columns={[
                 { key: 'name', title: 'Restaurant Name', sortable: true },
@@ -408,69 +453,57 @@ export default function MarketAnalysisPage() {
               exportable={true}
               pagination={true}
               pageSize={10}
-              onRowClick={(restaurant) => {
-                console.log('Restaurant selected:', restaurant)
-                // Could open detailed analysis modal
-              }}
             />
-          </div>
+          </ChartCard>
         )}
 
         {/* Market Insights Summary */}
-        <div className="mt-8">
-          <AnalysisCard
-            title="Market Analysis Summary"
-            description="Key findings and recommendations based on current data"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-center mb-3">
-                  <TrendingUp className="w-5 h-5 text-green-600 mr-2" />
-                  <h4 className="font-medium text-green-800">Growth Opportunity</h4>
-                </div>
-                <p className="text-sm text-green-700 mb-2">
-                  High foot traffic area with moderate competition density
-                </p>
-                <ul className="text-xs text-green-600 space-y-1">
-                  <li>• 15.2K daily foot traffic</li>
-                  <li>• 3.2 restaurants per 1000 residents</li>
-                  <li>• Average rating: 4.2/5</li>
-                </ul>
-              </div>
+        <ChartCard
+          title="Market Analysis Summary"
+          actions={[
+            {
+              label: "Export Insights",
+              icon: <Download className="h-4 w-4" />,
+              onClick: () => console.log('Export insights')
+            }
+          ]}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <InsightCard
+              type="opportunity"
+              title="Growth Opportunity"
+              description="High foot traffic area with moderate competition density"
+              priority={1}
+              impact={"High" as const}
+              action="Analyze Location"
+              onAction={() => console.log('Analyze location')}
+              icon={<TrendingUp className="w-5 h-5" />}
+            />
 
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center mb-3">
-                  <Users className="w-5 h-5 text-blue-600 mr-2" />
-                  <h4 className="font-medium text-blue-800">Target Demographics</h4>
-                </div>
-                <p className="text-sm text-blue-700 mb-2">
-                  Young professionals and tourists dominate the area
-                </p>
-                <ul className="text-xs text-blue-600 space-y-1">
-                  <li>• 25-35 age group: 40%</li>
-                  <li>• High disposable income</li>
-                  <li>• International cuisine preference</li>
-                </ul>
-              </div>
+            <InsightCard
+              type="info"
+              title="Target Demographics"
+              description="Young professionals and tourists dominate the area"
+              priority={2}
+              impact={"Medium" as const}
+              action="View Demographics"
+              onAction={() => console.log('View demographics')}
+              icon={<Users className="w-5 h-5" />}
+            />
 
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <div className="flex items-center mb-3">
-                  <Clock className="w-5 h-5 text-purple-600 mr-2" />
-                  <h4 className="font-medium text-purple-800">Peak Hours</h4>
-                </div>
-                <p className="text-sm text-purple-700 mb-2">
-                  Clear patterns in customer traffic throughout the day
-                </p>
-                <ul className="text-xs text-purple-600 space-y-1">
-                  <li>• Lunch: 12:00-14:00</li>
-                  <li>• Dinner: 19:00-22:00</li>
-                  <li>• Late night: 22:00-01:00</li>
-                </ul>
-              </div>
-            </div>
-          </AnalysisCard>
-        </div>
-      </PageWrapper>
-    </MainLayout>
+            <InsightCard
+              type="info"
+              title="Peak Hours"
+              description="Clear patterns in customer traffic throughout the day"
+              priority={3}
+              impact={"Low" as const}
+              action="Optimize Hours"
+              onAction={() => console.log('Optimize hours')}
+              icon={<Clock className="w-5 h-5" />}
+            />
+          </div>
+        </ChartCard>
+      </div>
+    </DashboardLayout>
   )
 }
