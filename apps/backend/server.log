@@ -1,0 +1,22 @@
+🚀 Starting BiteBase Simple Backend...
+✅ Database tables initialized
+✅ Sample data already exists or error occurred
+🚀 BiteBase Simple Backend running on http://0.0.0.0:8080
+📊 Health check: http://0.0.0.0:8080/health
+🍽️  Restaurants API: http://0.0.0.0:8080/api/restaurants
+📈 Market Analysis API: http://0.0.0.0:8080/api/market-analyses
+✅ Backend ready to serve requests!
+2025-05-31T12:02:21.873Z - POST /api/chat
+AI Chat Request - User: test-user, Message: How are my sales this month?
+2025-05-31T12:02:26.753Z - POST /api/chat
+AI Chat Request - User: test-user, Message: ยอดขายเดือนนี้เป็นยังไง?
+2025-05-31T12:04:17.995Z - GET /api/chat/history/NHyLRrC8fUa6eGqFfPxrQNT1eHx1
+2025-05-31T12:04:53.435Z - POST /api/chat
+AI Chat Request - User: NHyLRrC8fUa6eGqFfPxrQNT1eHx1, Message: How are my sales this month?
+2025-05-31T12:05:14.297Z - POST /api/chat
+AI Chat Request - User: NHyLRrC8fUa6eGqFfPxrQNT1eHx1, Message: แนะนำโปรโมชั่นหน่อย
+2025-05-31T12:21:54.111Z - GET /api/chat/history/6
+2025-05-31T12:22:37.604Z - POST /api/chat
+AI Chat Request - User: 6, Message: How are my sales this month?
+2025-05-31T12:23:10.088Z - POST /api/chat
+AI Chat Request - User: 6, Message: ยอดขายเดือนนี้เป็นอย่างไร

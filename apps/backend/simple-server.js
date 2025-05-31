@@ -8,6 +8,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const BiteBaseAIAssistant = require('./ai-assistant');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -15,6 +16,9 @@ const PORT = process.env.PORT || 8080;
 // Database setup
 const dbPath = path.join(__dirname, 'bitebase.db');
 const db = new sqlite3.Database(dbPath);
+
+// Initialize AI Assistant
+const aiAssistant = new BiteBaseAIAssistant(dbPath);
 
 // Middleware
 app.use(express.json());
@@ -341,7 +345,80 @@ app.get('/api/users/:uid', (req, res) => {
   });
 });
 
-// Mock AI endpoints to prevent frontend errors
+// AI Chat endpoint
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, userId = 'default-user', userContext = {} } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    console.log(`AI Chat Request - User: ${userId}, Message: ${message}`);
+    
+    // Process message with AI Assistant
+    const response = await aiAssistant.processMessage(userId, message, userContext);
+    
+    res.json({
+      success: true,
+      response: response,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('AI Chat Error:', error);
+    res.status(500).json({ 
+      error: 'Failed to process AI request',
+      details: error.message 
+    });
+  }
+});
+
+// Get user chat history
+app.get('/api/chat/history/:userId', (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { limit = 10 } = req.query;
+    
+    const history = aiAssistant.getUserHistory(userId, parseInt(limit));
+    
+    res.json({
+      success: true,
+      history: history,
+      count: history.length
+    });
+    
+  } catch (error) {
+    console.error('Chat History Error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get chat history',
+      details: error.message 
+    });
+  }
+});
+
+// Clear user chat session
+app.delete('/api/chat/session/:userId', (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    aiAssistant.clearUserSession(userId);
+    
+    res.json({
+      success: true,
+      message: 'Chat session cleared'
+    });
+    
+  } catch (error) {
+    console.error('Clear Session Error:', error);
+    res.status(500).json({ 
+      error: 'Failed to clear chat session',
+      details: error.message 
+    });
+  }
+});
+
+// Legacy research endpoint for backward compatibility
 app.post('/research', (req, res) => {
   // Mock AI research response
   res.json({

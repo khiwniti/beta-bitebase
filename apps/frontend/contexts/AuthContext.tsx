@@ -1,16 +1,16 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import {
-  User,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup
-} from 'firebase/auth'
 import { markUserAsFirstTime, clearUserSessionData } from '../utils/tourUtils'
+
+// Custom User interface to match our backend
+interface User {
+  id: number
+  email: string
+  role: string
+  name?: string
+  uid?: string // For compatibility with existing code
+}
 
 interface AuthContextType {
   user: User | null
@@ -40,23 +40,46 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
 
+  // Backend API base URL
+  const API_BASE = 'http://localhost:8081/api'
+
   useEffect(() => {
     setMounted(true)
 
-    // Only initialize Firebase auth on client side
+    // Check for existing token on client side
     if (typeof window !== 'undefined') {
-      // Dynamically import Firebase auth to ensure it only runs on client
-      import('../lib/firebase').then(({ auth }) => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-          setUser(user)
+      const token = localStorage.getItem('bitebase_token')
+      if (token) {
+        // Verify token with backend
+        fetch(`${API_BASE}/auth/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json()
+          }
+          throw new Error('Invalid token')
+        })
+        .then(data => {
+          setUser({
+            id: data.user.id,
+            email: data.user.email,
+            role: data.user.role,
+            name: data.user.name,
+            uid: data.user.id.toString() // For compatibility
+          })
           setLoading(false)
         })
-
-        return unsubscribe
-      }).catch((error) => {
-        console.error('Failed to initialize Firebase auth:', error)
+        .catch(() => {
+          localStorage.removeItem('bitebase_token')
+          setLoading(false)
+        })
+      } else {
         setLoading(false)
-      })
+      }
     } else {
       setLoading(false)
     }
@@ -77,8 +100,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signIn = async (email: string, password: string) => {
     setLoading(true)
     try {
-      const { auth } = await import('../lib/firebase')
-      await signInWithEmailAndPassword(auth, email, password)
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Login failed')
+      }
+
+      const data = await response.json()
+      
+      // Store token
+      localStorage.setItem('bitebase_token', data.token)
+      
+      // Set user
+      setUser({
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        name: data.user.name,
+        uid: data.user.id.toString()
+      })
+      
+      setLoading(false)
     } catch (error) {
       setLoading(false)
       throw error
@@ -88,12 +137,42 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signUp = async (email: string, password: string, userData?: any) => {
     setLoading(true)
     try {
-      const { auth } = await import('../lib/firebase')
-      const result = await createUserWithEmailAndPassword(auth, email, password)
+      const response = await fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          email, 
+          password,
+          firstName: userData?.firstName || userData?.name || email.split('@')[0],
+          lastName: userData?.lastName || 'User',
+          phone: userData?.phone || ''
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Registration failed')
+      }
+
+      const data = await response.json()
+      
+      // Store token
+      localStorage.setItem('bitebase_token', data.token)
+      
+      // Set user
+      setUser({
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        name: data.user.name,
+        uid: data.user.id.toString()
+      })
+      
       // Mark as first-time user for tour
       markUserAsFirstTime()
-      // In a real app, you would save userData to Firestore here
-      console.log('User created with additional data:', userData)
+      setLoading(false)
     } catch (error) {
       setLoading(false)
       throw error
@@ -103,23 +182,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signInWithGoogle = async (accountType?: string) => {
     setLoading(true)
     try {
-      const { auth } = await import('../lib/firebase')
-      const provider = new GoogleAuthProvider()
-      const result = await signInWithPopup(auth, provider)
-
-      // Check if this is a new user
-      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime
-
-      if (isNewUser) {
-        // Mark as first-time user for tour
-        markUserAsFirstTime()
-        if (accountType) {
-          // In a real app, you would save accountType to Firestore here
-          console.log('New Google user with account type:', accountType)
-        }
-      }
-
-      return { isNewUser }
+      // For now, we'll simulate Google sign-in by creating a demo account
+      // In production, you would integrate with Google OAuth
+      const demoEmail = `demo.${Date.now()}@bitebase.ai`
+      const demoPassword = 'demo123456'
+      
+      await signUp(demoEmail, demoPassword, { 
+        name: 'Demo User',
+        role: accountType || 'user'
+      })
+      
+      return { isNewUser: true }
     } catch (error) {
       setLoading(false)
       throw error
@@ -129,10 +202,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     setLoading(true)
     try {
-      const { auth } = await import('../lib/firebase')
-      await signOut(auth)
+      // Clear token and user data
+      localStorage.removeItem('bitebase_token')
+      setUser(null)
+      
       // Clear user session data on logout
       clearUserSessionData()
+      setLoading(false)
     } catch (error) {
       setLoading(false)
       throw error

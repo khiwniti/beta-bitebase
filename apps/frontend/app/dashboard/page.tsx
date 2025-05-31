@@ -33,6 +33,7 @@ import {
 } from "../../components/dashboard/DashboardGrid"
 import { ChartContainer, SimpleLineChart, SimpleBarChart } from "../../components/ui/chart-container"
 import { tourUtils } from "../../utils/tourUtils"
+import BiteBaseAIAssistant from "../../components/ai/BiteBaseAIAssistant"
 
 // Realistic data for Bella Vista Bistro - Mediterranean restaurant in Bangkok
 const bellaVistaMetrics = {
@@ -145,9 +146,6 @@ const sukhumvitCompetitors = [
 ]
 
 export default function DashboardPage() {
-  const [chatMessage, setChatMessage] = useState('')
-  const [chatMessages, setChatMessages] = useState<Array<{id: string, message: string, isUser: boolean, timestamp: string}>>([])
-  const [isTyping, setIsTyping] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -163,32 +161,7 @@ export default function DashboardPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleSendMessage = async () => {
-    if (!chatMessage.trim()) return
 
-    const userMessage = {
-      id: Date.now().toString(),
-      message: chatMessage,
-      isUser: true,
-      timestamp: new Date().toLocaleTimeString()
-    }
-
-    setChatMessages(prev => [...prev, userMessage])
-    setChatMessage('')
-    setIsTyping(true)
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = {
-        id: (Date.now() + 1).toString(),
-        message: `Based on your question about "${chatMessage}", I recommend analyzing your location's foot traffic patterns and competitor pricing strategies. Would you like me to run a detailed market analysis for your area?`,
-        isUser: false,
-        timestamp: new Date().toLocaleTimeString()
-      }
-      setChatMessages(prev => [...prev, aiResponse])
-      setIsTyping(false)
-    }, 2000)
-  }
 
   if (isLoading) {
     return (
@@ -294,76 +267,15 @@ export default function DashboardPage() {
 
       {/* Main Content Grid - 2 Sidebar Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* AI Chat Assistant */}
-        <div>
-          <ChartCard
-            title="AI Market Assistant"
-          >
-            <div className="space-y-4" data-tour="ai-chat">
-              {/* Chat Messages */}
-              <div className="h-96 overflow-y-auto space-y-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                {chatMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        msg.isUser
-                          ? 'bg-blue-600 text-white rounded-lg'
-                          : 'bg-white text-gray-900 border border-gray-200'
-                      }`}
-                    >
-                      <p className="text-sm">{msg.message}</p>
-                      <p className={`text-xs mt-1 ${msg.isUser ? 'text-blue-100' : 'text-gray-500'}`}>
-                        {msg.timestamp}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                
-                {isTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-lg">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {chatMessages.length === 0 && (
-                  <div className="text-center py-8">
-                    <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400 mb-2">Ask me anything about your restaurant business!</p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Try: "How can I increase my revenue?" or "Analyze my location"</p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Chat Input */}
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Ask about market trends, competitors, or business strategies..."
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  disabled={isTyping}
-                />
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!chatMessage.trim() || isTyping}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </ChartCard>
+        {/* BiteBase AI Assistant */}
+        <div data-tour="ai-chat">
+          <BiteBaseAIAssistant
+            userId={user?.uid || 'demo-user'}
+            title="BiteBase AI Assistant"
+            placeholder="Ask about your restaurant, sales, customers, or marketing..."
+            defaultLanguage="en"
+            className="h-[600px]"
+          />
         </div>
 
         {/* Quick Actions Sidebar */}
