@@ -1,106 +1,19 @@
+/workspace/beta-bitebase/node_modules/node-gyp-build/node-gyp-build.js:60
+  throw new Error('No native build was found for ' + target + '\n    loaded from: ' + dir + '\n')
+  ^
 
-> bitebase-backend-cloudflare@1.0.0 enhanced:start
-> node enhanced-server.js
+Error: No native build was found for platform=linux arch=x64 runtime=node abi=127 uv=1 libc=glibc node=22.16.0
+    loaded from: /workspace/beta-bitebase/node_modules/bcrypt
 
-✅ Enhanced database initialized successfully
-🚀 BiteBase Enhanced Server Started!
-📍 Server running on: http://localhost:8081
-📚 API Documentation: http://localhost:8081/api/docs
-🏥 Health Check: http://localhost:8081/health
-🔌 WebSocket enabled for real-time features
-🔐 JWT Authentication enabled
-⚡ Caching layer active
-📊 API usage tracking enabled
+    at load.resolve.load.path (/workspace/beta-bitebase/node_modules/node-gyp-build/node-gyp-build.js:60:9)
+    at load (/workspace/beta-bitebase/node_modules/node-gyp-build/node-gyp-build.js:22:30)
+    at Object.<anonymous> (/workspace/beta-bitebase/node_modules/bcrypt/bcrypt.js:2:43)
+    at Module._compile (node:internal/modules/cjs/loader:1730:14)
+    at Object..js (node:internal/modules/cjs/loader:1895:10)
+    at Module.load (node:internal/modules/cjs/loader:1465:32)
+    at Function._load (node:internal/modules/cjs/loader:1282:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.require (node:internal/modules/cjs/loader:1487:12)
 
-🎯 Ready for production deployment!
-✅ Admin user created/verified: admin@bitebase.ai
-[2025-05-31T12:14:36.922Z] POST /api/chat - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:14:36.922Z] Request Body: {
-  "message": "Hello! Can you help me with my restaurant business?",
-  "language": "en"
-}
-[2025-05-31T12:14:42.556Z] POST /api/chat - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:14:42.556Z] Request Body: {
-  "message": "Hello! Can you help me with my restaurant business?",
-  "language": "en"
-}
-[2025-05-31T12:14:49.155Z] POST /api/chat - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:14:49.155Z] Request Body: {
-  "message": "สวัสดีครับ ช่วยวิเคราะห์ยอดขายร้านอาหารให้หน่อยได้ไหม",
-  "language": "th"
-}
-[2025-05-31T12:14:55.389Z] POST /api/chat - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:14:55.389Z] Request Body: {
-  "message": "สวัสดีครับ ช่วยวิเคราะห์ยอดขายร้านอาหารให้หน่อยได้ไหม",
-  "language": "th"
-}
-[2025-05-31T12:18:16.450Z] POST /api/login - IP: 127.0.0.1 - UA: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36
-[2025-05-31T12:18:16.450Z] Request Body: {
-  "email": "test@bitebase.ai",
-  "password": "[REDACTED]"
-}
-[2025-05-31T12:19:10.095Z] POST /api/login - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:19:10.095Z] Request Body: {
-  "email": "test@bitebase.ai",
-  "password": "[REDACTED]"
-}
-[2025-05-31T12:19:13.697Z] POST /api/login - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:19:13.697Z] Request Body: {
-  "email": "test@bitebase.ai",
-  "password": "[REDACTED]"
-}
-[2025-05-31T12:19:41.580Z] POST /api/auth/login - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:19:41.580Z] Request Body: {
-  "email": "test@bitebase.ai",
-  "password": "[REDACTED]"
-}
-[2025-05-31T12:19:45.165Z] POST /api/auth/login - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:19:45.165Z] Request Body: {
-  "email": "test@bitebase.ai",
-  "password": "[REDACTED]"
-}
-[2025-05-31T12:19:49.905Z] POST /api/auth/register - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:19:49.905Z] Request Body: {
-  "email": "demo@bitebase.ai",
-  "password": "[REDACTED]",
-  "name": "Demo User",
-  "role": "user"
-}
-[2025-05-31T12:19:53.923Z] POST /api/auth/register - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:19:53.923Z] Request Body: {
-  "email": "demo@bitebase.ai",
-  "password": "[REDACTED]",
-  "name": "Demo User",
-  "role": "user"
-}
-[2025-05-31T12:20:08.624Z] POST /api/auth/register - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:20:08.624Z] Request Body: {
-  "email": "demo@bitebase.ai",
-  "password": "[REDACTED]",
-  "firstName": "Demo",
-  "lastName": "User"
-}
-[2025-05-31T12:20:12.079Z] POST /api/auth/register - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:20:12.079Z] Request Body: {
-  "email": "demo@bitebase.ai",
-  "password": "[REDACTED]",
-  "firstName": "Demo",
-  "lastName": "User"
-}
-[2025-05-31T12:20:16.523Z] POST /api/auth/login - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:20:16.523Z] Request Body: {
-  "email": "demo@bitebase.ai",
-  "password": "[REDACTED]"
-}
-[2025-05-31T12:20:20.003Z] POST /api/auth/login - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:20:20.003Z] Request Body: {
-  "email": "demo@bitebase.ai",
-  "password": "[REDACTED]"
-}
-[2025-05-31T12:20:50.954Z] GET /api/auth/profile - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:20:55.437Z] GET /api/auth/profile - IP: 127.0.0.1 - UA: curl/7.88.1
-[2025-05-31T12:21:51.858Z] POST /api/auth/login - IP: 127.0.0.1 - UA: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36
-[2025-05-31T12:21:51.858Z] Request Body: {
-  "email": "demo@bitebase.ai",
-  "password": "[REDACTED]"
-}
+Node.js v22.16.0

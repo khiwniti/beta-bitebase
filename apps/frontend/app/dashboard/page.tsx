@@ -34,6 +34,8 @@ import {
 import { ChartContainer, SimpleLineChart, SimpleBarChart } from "../../components/ui/chart-container"
 import { tourUtils } from "../../utils/tourUtils"
 import BiteBaseAIAssistant from "../../components/ai/BiteBaseAIAssistant"
+import ServiceHealthDashboard from "../../components/admin/ServiceHealthDashboard"
+import { useRestaurants } from "../../hooks/useRestaurantData"
 
 // Realistic data for Bella Vista Bistro - Mediterranean restaurant in Bangkok
 const bellaVistaMetrics = {
@@ -148,9 +150,11 @@ const sukhumvitCompetitors = [
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
+  const [showServiceHealth, setShowServiceHealth] = useState(false)
 
   const { user } = useAuth()
   const router = useRouter()
+  const { restaurants, loading: restaurantsLoading, error: restaurantsError } = useRestaurants()
 
   useEffect(() => {
     // Simulate loading time
@@ -177,16 +181,89 @@ export default function DashboardPage() {
   return (
     <div data-tour="dashboard">
       {/* Header Actions */}
-      <div className="flex justify-end gap-2 mb-6">
-        <Button variant="outline" onClick={() => console.log('Export report')}>
-          <Download className="h-4 w-4 mr-2" />
-          Export Report
-        </Button>
-        <Button onClick={() => router.push('/market-analysis')}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Analysis
-        </Button>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowServiceHealth(!showServiceHealth)}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Service Health
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => router.push('/restaurant-explorer')}
+          >
+            <Utensils className="h-4 w-4 mr-2" />
+            Restaurant Explorer
+          </Button>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => console.log('Export report')}>
+            <Download className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
+          <Button onClick={() => router.push('/market-analysis')}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Analysis
+          </Button>
+        </div>
       </div>
+
+      {/* Service Health Dashboard */}
+      {showServiceHealth && (
+        <div className="mb-8">
+          <ServiceHealthDashboard />
+        </div>
+      )}
+
+      {/* Real Restaurant Data Overview */}
+      <DashboardSection 
+        title="Live Restaurant Data" 
+        description="Real-time data from Wongnai and other platforms"
+        actions={
+          <Button variant="outline" size="sm" onClick={() => router.push('/restaurant-explorer')}>
+            <Utensils className="w-4 h-4 mr-2" />
+            Explore All
+          </Button>
+        }
+      >
+        <div className="bg-white rounded-lg border p-6">
+          {restaurantsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <RefreshCw className="w-6 h-6 animate-spin text-gray-400 mr-2" />
+              <span className="text-gray-600">Loading restaurant data...</span>
+            </div>
+          ) : restaurantsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-600 mb-4">{restaurantsError}</p>
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Retry
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-600">{restaurants.length}</div>
+                <div className="text-sm text-gray-600">Total Restaurants</div>
+              </div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">
+                  {restaurants.filter(r => r.platform === 'wongnai').length}
+                </div>
+                <div className="text-sm text-gray-600">Wongnai Restaurants</div>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">
+                  {restaurants.length > 0 ? (restaurants.reduce((sum, r) => sum + r.rating, 0) / restaurants.length).toFixed(1) : '0.0'}
+                </div>
+                <div className="text-sm text-gray-600">Average Rating</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </DashboardSection>
       {/* Key Metrics Overview */}
       <DashboardSection 
         title="Key Performance Metrics" 

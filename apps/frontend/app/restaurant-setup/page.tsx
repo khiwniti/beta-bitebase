@@ -1,905 +1,175 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "../../contexts/AuthContext"
-import { useLanguage } from "../../contexts/LanguageContext"
-import { DashboardLayout } from "../../components/layout/DashboardLayout"
-import { MetricCard, ChartCard, InsightCard, DashboardSection } from "../../components/dashboard/DashboardGrid"
-import ProductionMapComponent from "../../components/geospatial/ProductionMapComponent"
-import {
-  Search,
-  Send,
-  Bot,
-  User,
-  ChevronDown,
-  ChevronRight,
-  Loader2,
-  Ruler,
-  Home,
-  Languages,
-  Bell,
-  GitBranch,
-  Save
-} from "lucide-react"
+import { useState, useEffect } from 'react'
+import { apiClient } from '../../lib/api-client'
 
-// Use the production map component with real restaurant data
-const MapboxMap = ProductionMapComponent
-
-interface Message {
-  id: string
-  content: string
-  sender: 'user' | 'bot'
-  timestamp: Date
-}
-
-interface LocationData {
-  lat: number
-  lng: number
+interface Restaurant {
+  id: number | string
+  name: string
+  cuisine: string
+  latitude: number
+  longitude: number
   address: string
-  score?: number
-  insights?: string[]
-}
-
-interface GitStatus {
-  isRepo: boolean
-  branch: string
-  changes: number
-  lastCommit: string
-}
-
-// Quick suggestions for different languages
-const quickSuggestions = {
-  en: [
-    'Coffee shop analysis',
-    'Fine dining restaurant',
-    'Fast casual concept',
-    'Analyze demographics',
-    'Competition analysis',
-    'Foot traffic data'
-  ],
-  th: [
-    'วิเคราะห์ร้านกาแฟ',
-    'ร้านอาหารหรู',
-    'แนวคิดแฟสต์แคชชวล',
-    'วิเคราะห์ข้อมูลประชากร',
-    'วิเคราะห์คู่แข่ง',
-    'ข้อมูลการสัญจรของผู้คน'
-  ]
-}
-
-const placeholders = {
-  en: "Ask about market research, demographics, competition...",
-  th: "ถามเกี่ยวกับการวิจัยตลาด ข้อมูลประชากร คู่แข่ง..."
-}
-
-const initialMessages = {
-  en: "Welcome to BiteBase Intelligence! I'm your AI-powered market research consultant specializing in restaurant and cafe location analysis. I'll help you make data-driven decisions by analyzing demographics, competition, foot traffic, and market opportunities in your target area.\n\nTo get started, please tell me: What type of restaurant or cafe are you planning to open?",
-  th: "ยินดีต้อนรับสู่ BiteBase Intelligence! ผมเป็นที่ปรึกษาวิจัยตลาดด้วย AI ที่เชี่ยวชาญในการวิเคราะห์ทำเลร้านอาหารและคาเฟ่ ผมจะช่วยคุณตัดสินใจอย่างมีข้อมูลโดยการวิเคราะห์ข้อมูลประชากร คู่แข่ง การสัญจรของผู้คน และโอกาสทางการตลาดในพื้นที่เป้าหมายของคุณ\n\nเพื่อเริ่มต้น กรุณาบอกผม: คุณวางแผนจะเปิดร้านอาหารหรือคาเฟ่ประเภทไหน?"
+  rating: number
+  price_range: string
+  platform: string
+  phone?: string
+  website?: string
+  hours?: string
+  features?: string[]
+  images?: string[]
 }
 
 export default function RestaurantSetupPage() {
-  const { user, logout } = useAuth()
-  const { language, setLanguage } = useLanguage()
-  const router = useRouter()
-  const [mounted, setMounted] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [isInitialized, setIsInitialized] = useState(false)
-  const [inputValue, setInputValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [panelExpanded, setPanelExpanded] = useState(true)
-  const [heatmapToggles, setHeatmapToggles] = useState({
-    demographics: false,
-    population: false,
-    realEstate: false,
-    footTraffic: false
-  })
-  const [mapFilters, setMapFilters] = useState({
-    groceryStores: false,
-    strategicPoints: false,
-    competitors: true,
-    publicTransport: false
-  })
-  const [mapCenter] = useState<[number, number]>([13.7563, 100.5018])
-  const [mapZoom] = useState(14)
-  const [measurementMode, setMeasurementMode] = useState(false)
-  const [bufferRadius, setBufferRadius] = useState(500)
-  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [showGitPanel, setShowGitPanel] = useState(false)
-  const [gitStatus, setGitStatus] = useState<GitStatus>({
-    isRepo: false,
-    branch: '',
-    changes: 0,
-    lastCommit: ''
-  })
-  const [commitMessage, setCommitMessage] = useState('')
-  const [isCommitting, setIsCommitting] = useState(false)
-
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-    setMounted(true)
-    // Check Git status when component mounts
-    checkGitStatus()
+    fetchRestaurants()
   }, [])
 
-  // Initialize messages when language changes or component mounts
-  useEffect(() => {
-    if (mounted && !isInitialized) {
-      const initialMessage: Message = {
-        id: '1',
-        content: initialMessages[language as keyof typeof initialMessages],
-        sender: 'bot',
-        timestamp: new Date()
-      }
-      setMessages([initialMessage])
-      setIsInitialized(true)
-    }
-  }, [mounted, language, isInitialized])
-
-  // Update existing bot messages when language changes
-  useEffect(() => {
-    if (mounted && isInitialized) {
-      setMessages(prev => prev.map((msg, index) => {
-        if (msg.sender === 'bot' && index === 0) {
-          return {
-            ...msg,
-            content: initialMessages[language as keyof typeof initialMessages]
-          }
-        }
-        return msg
-      }))
-    }
-  }, [language, mounted, isInitialized])
-
-  useEffect(() => {
-    if (mounted) {
-      scrollToBottom()
-    }
-  }, [mounted, messages])
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: content.trim(),
-      sender: 'user',
-      timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    setInputValue('')
-    setIsLoading(true)
-
+  const fetchRestaurants = async () => {
     try {
-      // Get AI response from our deployed AI agents worker
-      const aiResponse = await generateBotResponse(content)
-
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: aiResponse,
-        sender: 'bot',
-        timestamp: new Date()
+      setLoading(true)
+      const response = await apiClient.getAllRestaurants()
+      if (response.error) {
+        setError(response.error)
+        setRestaurants([])
+      } else {
+        // The backend returns { restaurants: [...], total: number }
+        const restaurantData = response.data?.restaurants || response.data || []
+        setRestaurants(restaurantData)
+        setError(null)
       }
-
-      setMessages(prev => [...prev, botResponse])
-    } catch (error) {
-      console.error('Error sending message:', error)
-
-      // Add error message
-      const errorResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: language === 'th'
-          ? 'ขออภัย เกิดข้อผิดพลาดในการส่งข้อความ กรุณาลองใหม่อีกครั้ง'
-          : 'Sorry, there was an error sending your message. Please try again.',
-        sender: 'bot',
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, errorResponse])
+    } catch (err) {
+      setError('Failed to fetch restaurants')
+      console.error('Error fetching restaurants:', err)
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
-  // Detect language from user input
-  const detectLanguage = (text: string): 'en' | 'th' => {
-    // Simple Thai character detection
-    const thaiPattern = /[\u0E00-\u0E7F]/
-    return thaiPattern.test(text) ? 'th' : 'en'
-  }
-
-  // AI response generation function using deployed Cloudflare workers
-  const generateBotResponse = async (userInput: string): Promise<string> => {
-    try {
-      // Auto-detect language and switch if needed
-      const detectedLang = detectLanguage(userInput)
-      if (detectedLang !== language) {
-        setLanguage(detectedLang)
-      }
-
-      // Call our local CopilotKit service
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'http://localhost:8001'
-
-      const response = await fetch(`${aiAgentsUrl}/copilotkit/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userInput,
-          user_id: 'restaurant-manager',
-          session_id: 'restaurant-setup-session',
-          context: {
-            location: 'General consultation',
-            cuisine_type: 'restaurant planning',
-            language: detectedLang,
-            conversationHistory: messages.slice(-5).map(msg => ({
-              role: msg.sender === 'user' ? 'user' : 'assistant',
-              content: msg.content
-            }))
-          }
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to get AI response')
-      }
-
-      const data = await response.json()
-
-      if (data.error) {
-        throw new Error(data.message || 'AI service error')
-      }
-
-      // Return the response from CopilotKit service
-      return data.response || data.message || 'AI response received successfully'
-    } catch (error) {
-      console.error('Error getting AI response:', error)
-
-      // Fallback response based on language
-      if (language === 'th') {
-        return 'ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบ AI กรุณาลองใหม่อีกครั้ง'
-      } else {
-        return 'Sorry, there was an error connecting to the AI system. Please try again.'
-      }
-    }
-  }
-
-  const handleQuickSuggestion = (suggestion: string) => {
-    handleSendMessage(suggestion)
-  }
-
-  const toggleHeatmap = (type: keyof typeof heatmapToggles) => {
-    setHeatmapToggles(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }))
-  }
-
-  const handleLocationClick = async (lat: number, lng: number, address: string) => {
-    setIsAnalyzing(true)
-    const newLocation: LocationData = {
-      lat,
-      lng,
-      address
-    }
-    setSelectedLocation(newLocation)
-
-    try {
-      // Call our local CopilotKit service for location analysis
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'http://localhost:8001'
-
-      const response = await fetch(`${aiAgentsUrl}/copilotkit/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: `Analyze this location for restaurant suitability: ${address} (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
-          user_id: 'restaurant-manager',
-          session_id: 'location-analysis-session',
-          context: {
-            coordinates: { lat, lng },
-            analysis_type: 'location_suitability',
-            address: address
-          }
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-
-        // Extract insights from AI analysis
-        const insights = [
-          "AI-powered location analysis completed",
-          "Market opportunity assessment: Favorable",
-          "Demographic analysis: Strong target audience",
-          "Competition density: Moderate to low",
-          "Accessibility score: High"
-        ]
-
-        const score = data.opportunity_score || Math.floor(Math.random() * 3) + 8
-
-        setSelectedLocation({
-          ...newLocation,
-          score,
-          insights
-        })
-      } else {
-        // Fallback to simulated analysis
-        const insights = [
-          "High foot traffic area with excellent visibility",
-          "Strong demographic match for restaurant concepts",
-          "Competitive rent prices for the area",
-          "Good public transportation accessibility",
-          "Growing commercial district with development potential"
-        ]
-
-        const score = Math.floor(Math.random() * 3) + 8
-
-        setSelectedLocation({
-          ...newLocation,
-          score,
-          insights
-        })
-      }
-    } catch (error) {
-      console.error('Error analyzing location:', error)
-
-      // Fallback to simulated analysis
-      const insights = [
-        "Location analysis in progress",
-        "Basic demographic data available",
-        "Market research data pending",
-        "Competition analysis available",
-        "Accessibility assessment completed"
-      ]
-
-      const score = Math.floor(Math.random() * 3) + 7
-
-      setSelectedLocation({
-        ...newLocation,
-        score,
-        insights
-      })
-    } finally {
-      setIsAnalyzing(false)
-    }
-  }
-
-  const handleLogout = async () => {
-    try {
-      await logout()
-      router.push('/')
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
-  }
-
-  // Git operations
-  const checkGitStatus = async () => {
-    try {
-      const response = await fetch('/api/git/status', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setGitStatus({
-          isRepo: data.isRepo,
-          branch: data.branch || 'unknown',
-          changes: data.changes || 0,
-          lastCommit: data.lastCommit || 'No commits yet'
-        })
-      } else {
-        console.error('Failed to get Git status')
-      }
-    } catch (error) {
-      console.error('Error checking git status:', error)
-    }
-  }
-
-  const handleCommitAndPush = async () => {
-    if (!commitMessage.trim()) {
-      alert(language === 'th' 
-        ? 'กรุณาใส่ข้อความสำหรับการ commit'
-        : 'Please enter a commit message')
+  const searchRestaurants = async () => {
+    if (!searchQuery.trim()) {
+      fetchRestaurants()
       return
     }
 
-    setIsCommitting(true)
     try {
-      const response = await fetch('/api/git/commit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: commitMessage,
-          push: true
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        alert(language === 'th'
-          ? `Commit สำเร็จ: ${data.commitId}\nPush สำเร็จ`
-          : `Successfully committed: ${data.commitId}\nSuccessfully pushed to remote`)
-        setCommitMessage('')
-        checkGitStatus() // Refresh status
-      } else {
-        const errorData = await response.json()
-        alert(language === 'th'
-          ? `การ commit ล้มเหลว: ${errorData.error}`
-          : `Commit failed: ${errorData.error}`)
-      }
-    } catch (error) {
-      console.error('Error during commit and push:', error)
-      alert(language === 'th'
-        ? 'เกิดข้อผิดพลาดในการ commit และ push'
-        : 'Error during commit and push operation')
+      setLoading(true)
+      const response = await apiClient.get(`/restaurants/search?query=${encodeURIComponent(searchQuery)}`)
+      setRestaurants(response.data)
+      setError(null)
+    } catch (err) {
+      setError('Failed to search restaurants')
+      console.error('Error searching restaurants:', err)
     } finally {
-      setIsCommitting(false)
+      setLoading(false)
     }
   }
 
-  if (!mounted) {
-    return (
-      <div className="flex h-screen bg-gray-50 items-center justify-center">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-gray-600">Loading BiteBase Intelligence...</p>
-        </div>
-      </div>
-    )
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      searchRestaurants()
+    }
   }
 
   return (
-    <DashboardLayout>
-      <div className="space-y-8">
-        {/* Page Header */}
-        <DashboardSection
-          title="Restaurant Setup"
-          description="AI-powered market research and location analysis for your restaurant"
-          actions={[
-            {
-              label: "Save Progress",
-              icon: <Save className="h-4 w-4" />,
-              onClick: () => console.log('Save progress')
-            }
-          ]}
-        />
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Restaurant Setup</h1>
+        <p className="text-gray-600">Connect with real restaurant data and market intelligence</p>
+      </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
-          {/* Map Section */}
-          <ChartCard
-            title="Interactive Location Map"
-            actions={[
-              {
-                label: "Fullscreen",
-                icon: <Search className="h-4 w-4" />,
-                onClick: () => console.log('Fullscreen map')
-              }
-            ]}
+      {/* Search Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Search Restaurants</h2>
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="Search restaurants by name, cuisine, or location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          />
+          <button
+            onClick={searchRestaurants}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            <div className="relative h-full overflow-hidden">
-          {/* Git Panel Button */}
-          <button 
-            onClick={() => setShowGitPanel(!showGitPanel)}
-            className="absolute top-4 right-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-            title={language === 'en' ? 'Git Operations' : 'ปฏิบัติการ Git'}
-          >
-            <GitBranch className="w-5 h-5 text-gray-700" />
-            {gitStatus.changes > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {gitStatus.changes}
-              </span>
-            )}
+            Search
           </button>
+          <button
+            onClick={fetchRestaurants}
+            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            Show All
+          </button>
+        </div>
+      </div>
 
-          {/* Git Panel */}
-          {showGitPanel && (
-            <div className="absolute top-16 right-4 z-10 bg-white rounded-lg shadow-lg p-4 w-80">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-gray-900">Git Operations</h3>
-                <button
-                  onClick={() => setShowGitPanel(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </div>
+      {/* Results Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold">Restaurant Data</h2>
+          <p className="text-gray-600 mt-1">
+            {loading ? 'Loading...' : `Found ${restaurants.length} restaurants`}
+          </p>
+        </div>
 
-              {gitStatus.isRepo ? (
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex items-center space-x-2 mb-1">
-                      <GitBranch className="w-4 h-4 text-gray-600" />
-                      <span className="text-sm font-medium text-gray-700">Branch:</span>
-                      <span className="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                        {gitStatus.branch}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium text-gray-700">Changes:</span>
-                      <span className={`text-sm ${gitStatus.changes > 0 ? 'text-orange-600' : 'text-green-600'}`}>
-                        {gitStatus.changes} file{gitStatus.changes !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500 mb-3">
-                      Last commit: {gitStatus.lastCommit}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {language === 'en' ? 'Commit Message' : 'ข้อความ Commit'}
-                    </label>
-                    <textarea
-                      value={commitMessage}
-                      onChange={(e) => setCommitMessage(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                      placeholder={language === 'en' ? "Describe your changes..." : "อธิบายการเปลี่ยนแปลง..."}
-                    ></textarea>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <button
-                      onClick={checkGitStatus}
-                      className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200"
-                    >
-                      {language === 'en' ? 'Refresh Status' : 'รีเฟรชสถานะ'}
-                    </button>
-                    <button
-                      onClick={handleCommitAndPush}
-                      disabled={isCommitting || gitStatus.changes === 0 || !commitMessage.trim()}
-                      className="px-3 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                    >
-                      {isCommitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {language === 'en' ? 'Processing...' : 'กำลังดำเนินการ...'}
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 mr-2" />
-                          {language === 'en' ? 'Commit & Push' : 'Commit และ Push'}
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-gray-600 mb-3">
-                    {language === 'en' 
-                      ? 'No Git repository detected in this project.' 
-                      : 'ไม่พบ Git repository ในโปรเจคนี้'}
-                  </p>
-                  <button
-                    onClick={checkGitStatus}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
-                  >
-                    {language === 'en' ? 'Refresh Status' : 'รีเฟรชสถานะ'}
-                  </button>
-                </div>
-              )}
+        <div className="p-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-800">{error}</p>
             </div>
           )}
 
-          <MapboxMap
-            center={mapCenter}
-            zoom={mapZoom}
-            className="h-full w-full"
-            selectedLocation={selectedLocation}
-            searchRadius={1000}
-            onClick={(e: any) => {
-              // Handle map click for production map component
-              if (e.latlng) {
-                handleLocationClick(e.latlng.lat, e.latlng.lng, `Location ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`)
-              } else if (e.lat && e.lng) {
-                handleLocationClick(e.lat, e.lng, `Location ${e.lat.toFixed(4)}, ${e.lng.toFixed(4)}`)
-              }
-
-              // Handle restaurant analysis if clicked on a restaurant
-              if (e.restaurant) {
-                const restaurant = e.restaurant
-                const message = `Analyze competition for ${restaurant.name} (${restaurant.cuisine} restaurant) at ${restaurant.latitude.toFixed(4)}, ${restaurant.longitude.toFixed(4)}`
-                handleSendMessage(message)
-              }
-            }}
-          >
-            {/* Map Controls */}
-            <div className="absolute top-4 left-4 space-y-2 max-w-[200px] sm:max-w-none">
-              <div className="map-control-panel">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Map Layers</h3>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={heatmapToggles.demographics}
-                      onChange={() => toggleHeatmap('demographics')}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Demographics</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={heatmapToggles.population}
-                      onChange={() => toggleHeatmap('population')}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Population Density</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={heatmapToggles.realEstate}
-                      onChange={() => toggleHeatmap('realEstate')}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Real Estate</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={heatmapToggles.footTraffic}
-                      onChange={() => toggleHeatmap('footTraffic')}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Foot Traffic</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="map-control-panel">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Location Filters</h3>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={mapFilters.competitors}
-                      onChange={() => setMapFilters(prev => ({ ...prev, competitors: !prev.competitors }))}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Competitors</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={mapFilters.groceryStores}
-                      onChange={() => setMapFilters(prev => ({ ...prev, groceryStores: !prev.groceryStores }))}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Grocery Stores</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={mapFilters.strategicPoints}
-                      onChange={() => setMapFilters(prev => ({ ...prev, strategicPoints: !prev.strategicPoints }))}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Strategic Points</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={mapFilters.publicTransport}
-                      onChange={() => setMapFilters(prev => ({ ...prev, publicTransport: !prev.publicTransport }))}
-                      className="map-control-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Public Transport</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="map-control-panel">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Tools</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setMeasurementMode(!measurementMode)}
-                    className={`w-full flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-theme ${
-                      measurementMode
-                        ? 'btn-tool-active'
-                        : 'btn-tool-inactive'
-                    }`}
-                  >
-                    <Ruler className="w-4 h-4 mr-2" />
-                    Measure Distance
-                  </button>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-600">Buffer:</span>
-                    <input
-                      type="range"
-                      min="100"
-                      max="1000"
-                      step="50"
-                      value={bufferRadius}
-                      onChange={(e) => setBufferRadius(Number(e.target.value))}
-                      className="flex-1"
-                    />
-                    <span className="text-xs text-gray-600">{bufferRadius}m</span>
-                  </div>
-                </div>
-              </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="ml-3 text-gray-600">Loading restaurants...</span>
             </div>
-
-            {/* Location Analysis Panel */}
-            {selectedLocation && (
-              <div className="absolute top-4 right-4 w-72 sm:w-80 bg-white rounded-lg shadow-lg p-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">Location Analysis</h3>
-                  <button
-                    onClick={() => setSelectedLocation(null)}
-                    className="text-gray-400 hover:text-gray-600 flex-shrink-0 ml-2"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                {isAnalyzing ? (
-                  <div className="text-center py-8">
-                    <Loader2 className="w-8 h-8 loading-spinner mx-auto mb-3" />
-                    <p className="text-gray-600">Analyzing location potential...</p>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Location Score</span>
-                        <span className="text-2xl font-bold text-primary-theme">{selectedLocation.score}/10</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="progress-bar-primary"
-                          style={{ width: `${(selectedLocation.score || 0) * 10}%` }}
-                        ></div>
-                      </div>
-                    </div>
-
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Key Insights</h4>
-                      <ul className="space-y-1">
-                        {selectedLocation.insights?.map((insight, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start">
-                            <span className="text-primary-theme mr-2">•</span>
-                            {insight}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <button className="w-full btn-primary py-2 px-4 rounded-lg text-sm font-medium">
-                      Generate Full Report
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </MapboxMap>
+          ) : restaurants.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No restaurants found</p>
             </div>
-          </ChartCard>
-
-          {/* AI Assistant Panel */}
-          <ChartCard
-            title="BiteBase AI Assistant"
-            actions={[
-              {
-                label: "Clear Chat",
-                icon: <Bot className="h-4 w-4" />,
-                onClick: () => setMessages([])
-              }
-            ]}
-          >
-            <div className="flex flex-col h-full">
-
-
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[280px] px-3 py-2 rounded-lg break-words ${
-                    message.sender === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-900'
-                  }`}
-                >
-                  {message.sender === 'bot' ? (
-                    <div className="flex items-start space-x-2">
-                      <Bot className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-                      <p className="text-xs text-blue-100 mt-1 text-right">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {restaurants.map((restaurant) => (
+                <div key={restaurant.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="font-semibold text-lg mb-2">{restaurant.name}</h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <p><span className="font-medium">Cuisine:</span> {restaurant.cuisine}</p>
+                    <p><span className="font-medium">Address:</span> {restaurant.address}</p>
+                    <p><span className="font-medium">Rating:</span> ⭐ {restaurant.rating}/5</p>
+                    <p><span className="font-medium">Price Range:</span> {restaurant.price_range}</p>
+                    <p><span className="font-medium">Platform:</span> {restaurant.platform}</p>
+                    {restaurant.phone && (
+                      <p><span className="font-medium">Phone:</span> {restaurant.phone}</p>
+                    )}
+                    {restaurant.hours && (
+                      <p><span className="font-medium">Hours:</span> {restaurant.hours}</p>
+                    )}
+                    {restaurant.features && restaurant.features.length > 0 && (
+                      <p><span className="font-medium">Features:</span> {restaurant.features.join(', ')}</p>
+                    )}
+                    {restaurant.website && (
+                      <p><span className="font-medium">Website:</span> 
+                        <a href={restaurant.website} target="_blank" rel="noopener noreferrer" 
+                           className="text-green-600 hover:text-green-800 ml-1">
+                          Visit
+                        </a>
                       </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-900 max-w-[280px] px-3 py-2 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <Bot className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Quick Suggestions */}
-          <div className="p-4 border-t border-gray-100">
-            <div className="flex flex-wrap gap-2 mb-3">
-              {quickSuggestions[language as keyof typeof quickSuggestions].map((suggestion: string, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => handleQuickSuggestion(suggestion)}
-                  className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors whitespace-nowrap"
-                >
-                  {suggestion}
-                </button>
               ))}
             </div>
-          </div>
-
-          {/* Input Area */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(inputValue)}
-                placeholder={placeholders[language as keyof typeof placeholders]}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                disabled={isLoading}
-              />
-              <button
-                onClick={() => handleSendMessage(inputValue)}
-                disabled={isLoading || !inputValue.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-            </div>
-          </ChartCard>
+          )}
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   )
 }

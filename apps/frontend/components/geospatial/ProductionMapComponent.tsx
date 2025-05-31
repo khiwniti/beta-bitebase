@@ -96,29 +96,32 @@ export default function ProductionMapComponent({
     setError(null)
     
     try {
-      // Try our AI agents worker first (has restaurant data)
-      const aiAgentsUrl = process.env.NEXT_PUBLIC_AGENT_API_URL || 'http://localhost:8080'
+      console.log('🔍 Fetching restaurants for:', { lat, lng, radius })
       
-      const response = await fetch(`${aiAgentsUrl}/api/restaurants?latitude=${lat}&longitude=${lng}&radius=${radius}`)
+      // Use the correct API client to fetch real restaurant data
+      const { apiClient } = await import('../../lib/api-client')
       
-      if (response.ok) {
-        const data = await response.json()
-        setRestaurants(data.restaurants || [])
+      console.log('📡 API Client loaded, making request...')
+      
+      const response = await apiClient.fetchRealRestaurantData({
+        latitude: lat,
+        longitude: lng,
+        radius: radius,
+        platforms: ['wongnai', 'google']
+      })
+      
+      console.log('📊 API Response:', response)
+      
+      if (response.data) {
+        console.log('✅ Successfully loaded restaurants:', response.data.all_restaurants?.length)
+        setRestaurants(response.data.all_restaurants || [])
       } else {
-        // Fallback to backend API
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
-        const backendResponse = await fetch(`${backendUrl}/api/restaurants?latitude=${lat}&longitude=${lng}&radius=${radius}`)
-        
-        if (backendResponse.ok) {
-          const backendData = await backendResponse.json()
-          setRestaurants(backendData.restaurants || [])
-        } else {
-          throw new Error('Failed to fetch restaurant data')
-        }
+        console.error('❌ API Error:', response.error)
+        throw new Error(response.error || 'Failed to fetch restaurant data')
       }
     } catch (err) {
-      console.error('Error fetching restaurants:', err)
-      setError('Failed to load restaurant data')
+      console.error('💥 Error fetching restaurants:', err)
+      setError(`Failed to load restaurant data: ${err instanceof Error ? err.message : 'Unknown error'}`)
       setRestaurants([])
     } finally {
       setLoading(false)

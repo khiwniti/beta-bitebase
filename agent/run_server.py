@@ -155,6 +155,15 @@ async def status():
         "version": "0.1.0"
     }
 
+@app.get("/health")
+async def health():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "service": "BiteBase AI Agent",
+        "version": "0.1.0"
+    }
+
 @app.post("/api/research")
 async def research_location(request: LocationRequest):
     """Run restaurant research for a specific location"""

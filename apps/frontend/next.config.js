@@ -1,11 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,  // Disable strict mode to help with React hooks issues
-  output: 'export',  // Enable static export
+  // output: 'export',  // Disable static export for development
   distDir: '.next',
   trailingSlash: true,
   images: {
     unoptimized: true
+  },
+  // Development server configuration
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'ALLOWALL',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+        ],
+      },
+    ];
   },
   // Headers are not supported with static export
   // Use _headers file for Cloudflare Pages instead

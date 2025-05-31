@@ -36,66 +36,22 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [mounted, setMounted] = useState(false)
+  // For demo purposes, set a mock user and skip authentication
+  const [user, setUser] = useState<User | null>({
+    id: 1,
+    email: 'demo@bitebase.com',
+    role: 'owner',
+    name: 'Demo User',
+    uid: '1',
+    displayName: 'Demo User'
+  })
+  const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(true)
 
   // Backend API base URL
-  const API_BASE = 'http://localhost:8081/api'
+  const API_BASE = 'https://work-2-iedxpnjtcfddboej.prod-runtime.all-hands.dev/api'
 
-  useEffect(() => {
-    setMounted(true)
-
-    // Check for existing token on client side
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('bitebase_token')
-      if (token) {
-        // Verify token with backend
-        fetch(`${API_BASE}/auth/profile`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(response => {
-          if (response.ok) {
-            return response.json()
-          }
-          throw new Error('Invalid token')
-        })
-        .then(data => {
-          setUser({
-            id: data.user.id,
-            email: data.user.email,
-            role: data.user.role,
-            name: data.user.name,
-            uid: data.user.id.toString() // For compatibility
-          })
-          setLoading(false)
-        })
-        .catch(() => {
-          localStorage.removeItem('bitebase_token')
-          setLoading(false)
-        })
-      } else {
-        setLoading(false)
-      }
-    } else {
-      setLoading(false)
-    }
-  }, [])
-
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-gray-600">Loading BiteBase...</p>
-        </div>
-      </div>
-    )
-  }
+  // Skip hydration check for demo
 
   const signIn = async (email: string, password: string) => {
     setLoading(true)
