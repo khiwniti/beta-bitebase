@@ -8,31 +8,5 @@
     "NEXT_PUBLIC_STRAPI_URL": "https://bitebase-strapi-cms.onrender.com",
     "NEXT_PUBLIC_AGENT_API_URL": "https://bitebase-ai-gateway.onrender.com",
     "NEXT_PUBLIC_SITE_URL": "https://beta.bitebase.app"
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/admin",
-      "destination": "https://bitebase-strapi-cms.onrender.com/admin",
-      "permanent": false
-    }
-  ]
+  }
 }
