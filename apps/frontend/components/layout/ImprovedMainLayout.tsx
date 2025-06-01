@@ -192,8 +192,8 @@ export function MainLayout({
         }
         
         // If the item has subitems and one is active, expand it
-        if (item.subitems) {
-          item.subitems.forEach(subitem => {
+        if ('subitems' in item && item.subitems) {
+          (item as any).subitems.forEach((subitem: any) => {
             if (pathname === subitem.href) {
               setExpandedItems(prev => ({ ...prev, [item.name]: true }));
             }
@@ -235,6 +235,7 @@ export function MainLayout({
   }
 
   const isActive = (href: string) => {
+    if (!pathname) return false;
     if (href === '/dashboard') {
       return pathname === href
     }
@@ -624,7 +625,7 @@ export function MainLayout({
                                             ? 'text-gray-300 hover:bg-gray-700 hover:text-white border-l-4 border-transparent hover:border-gray-600' 
                                             : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent hover:border-gray-300'
                                       } group flex items-center px-2 py-2 text-sm font-medium transition-all duration-200 rounded-r-lg ${
-                                        item.highlight 
+                                        ('highlight' in item && item.highlight)
                                           ? darkMode 
                                             ? 'bg-emerald-900/20 border-emerald-800' 
                                             : 'bg-emerald-50/50 border-emerald-100' 
@@ -648,16 +649,16 @@ export function MainLayout({
                                         <div className="flex-1">
                                           <div className="flex items-center justify-between">
                                             <div className="font-medium">{item.name}</div>
-                                            {item.badge && (
+                                            {'badge' in item && item.badge && (
                                               <span className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
                                                 darkMode 
                                                   ? 'bg-emerald-900 text-emerald-300' 
                                                   : 'bg-emerald-100 text-emerald-800'
                                               }`}>
-                                                {item.badge}
+                                                {(item as any).badge}
                                               </span>
                                             )}
-                                            {item.subitems && (
+                                            {'subitems' in item && item.subitems && (
                                               <button
                                                 onClick={(e) => {
                                                   e.preventDefault();
@@ -685,9 +686,9 @@ export function MainLayout({
                                     </Link>
                                     
                                     {/* Subitems */}
-                                    {!collapsedSidebar && item.subitems && expandedItems[item.name] && (
+                                    {!collapsedSidebar && 'subitems' in item && item.subitems && expandedItems[item.name] && (
                                       <div className="mt-1 ml-7 space-y-1">
-                                        {item.subitems.map((subitem) => {
+                                        {(item as any).subitems.map((subitem: any) => {
                                           const subActive = pathname === subitem.href;
                                           return (
                                             <Link
@@ -901,7 +902,7 @@ export function MainLayout({
                                         : 'border-transparent text-gray-700 hover:bg-gray-100 hover:text-gray-900 border-l-4'
                                   } group flex items-center px-3 py-3 text-base font-medium rounded-lg transition-all duration-200`}
                                   onClick={() => {
-                                    if (!item.subitems) {
+                                    if (!('subitems' in item) || !item.subitems) {
                                       setSidebarOpen(false);
                                     }
                                   }}
@@ -920,16 +921,16 @@ export function MainLayout({
                                   <div>
                                     <div className="flex items-center justify-between">
                                       <div className="font-medium">{item.name}</div>
-                                      {item.badge && (
+                                      {'badge' in item && item.badge && (
                                         <span className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
                                           darkMode 
                                             ? 'bg-emerald-900 text-emerald-300' 
                                             : 'bg-emerald-100 text-emerald-800'
                                         }`}>
-                                          {item.badge}
+                                          {(item as any).badge}
                                         </span>
                                       )}
-                                      {item.subitems && (
+                                      {'subitems' in item && item.subitems && (
                                         <button
                                           onClick={(e) => {
                                             e.preventDefault();
@@ -956,9 +957,9 @@ export function MainLayout({
                                 </Link>
                                 
                                 {/* Mobile Subitems */}
-                                {item.subitems && expandedItems[item.name] && (
+                                {'subitems' in item && item.subitems && expandedItems[item.name] && (
                                   <div className="mt-1 ml-12 space-y-1">
-                                    {item.subitems.map((subitem) => {
+                                    {(item as any).subitems.map((subitem: any) => {
                                       const subActive = pathname === subitem.href;
                                       return (
                                         <Link

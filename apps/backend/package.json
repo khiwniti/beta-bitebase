@@ -5,6 +5,8 @@
   "main": "cloudflare-worker.js",
   "scripts": {
     "start": "node minimal-server.js",
+    "build": "echo 'No build step required for Express server'",
+    "express:start": "node minimal-server.js",
     "dev": "node minimal-server.js",
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",

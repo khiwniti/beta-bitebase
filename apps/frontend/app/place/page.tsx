@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { MetricCard } from "../../components/ui/metric-card";
+import { MetricCard } from "../../components/dashboard/DashboardGrid";
 import { DataTable } from "../../components/ui/data-table";
 import { ChartContainer, SimpleLineChart, SimpleBarChart } from "../../components/ui/chart-container";
 import {
@@ -43,7 +43,6 @@ export default function PlacePage() {
             trend: 'up' as const
           }}
           icon={<Eye className="h-5 w-5" />}
-          variant="success"
           description="Peak: 12-2 PM, 7-9 PM"
         />
 
@@ -56,7 +55,6 @@ export default function PlacePage() {
             trend: 'up' as const
           }}
           icon={<Target className="h-5 w-5" />}
-          variant="success"
           description="High growth opportunity"
         />
 
@@ -69,7 +67,6 @@ export default function PlacePage() {
             trend: 'down' as const
           }}
           icon={<Building className="h-5 w-5" />}
-          variant="warning"
           description="Restaurants within 1 mile"
         />
 
@@ -82,7 +79,6 @@ export default function PlacePage() {
             trend: 'up' as const
           }}
           icon={<Star className="h-5 w-5" />}
-          variant="success"
           description="Overall location rating"
         />
       </div>

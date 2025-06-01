@@ -5,13 +5,7 @@ import { markUserAsFirstTime, clearUserSessionData } from "../utils/tourUtils";
 import { GoogleAuth } from "google-auth-library";
 
 // Custom User interface to match our backend
-interface User {
-  id: number;
-  email: string;
-  role: string;
-  name?: string;
-  uid?: string; // For compatibility with existing code
-}
+
 
 interface AuthContextType {
   user: User | null;

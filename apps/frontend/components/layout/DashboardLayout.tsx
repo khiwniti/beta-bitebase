@@ -224,8 +224,8 @@ export function DashboardLayout({
           setExpandedItems(prev => ({ ...prev, [item.name]: true }));
         }
         
-        if (item.subitems) {
-          item.subitems.forEach(subitem => {
+        if ('subitems' in item && item.subitems) {
+          (item as any).subitems.forEach((subitem: any) => {
             if (pathname === subitem.href) {
               setExpandedItems(prev => ({ ...prev, [item.name]: true }));
             }
@@ -245,6 +245,7 @@ export function DashboardLayout({
   }, [darkMode]);
 
   const isActive = (href: string) => {
+    if (!pathname) return false;
     if (href === '/dashboard') {
       return pathname === href
     }
@@ -282,8 +283,8 @@ export function DashboardLayout({
           }
         }
         
-        if (item.subitems) {
-          item.subitems.forEach(subitem => {
+        if ('subitems' in item && item.subitems) {
+          (item as any).subitems.forEach((subitem: any) => {
             if (pathname === subitem.href) {
               currentSection = section.name;
               if (!pageTitle) {
@@ -381,17 +382,17 @@ export function DashboardLayout({
 
                             {!sidebarCollapsed && (
                               <div className="flex items-center space-x-2">
-                                {item.badge && (
+                                {'badge' in item && item.badge && (
                                   <span className={`px-2 py-0.5 text-xs rounded-full font-medium
-                                    ${item.badge === 'Pro' 
+                                    ${(item as any).badge === 'Pro' 
                                       ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 dark:from-purple-900/30 dark:to-pink-900/30 dark:text-purple-400' 
                                       : 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-400'
                                     }`}>
-                                    {item.badge}
+                                    {(item as any).badge}
                                   </span>
                                 )}
                                 
-                                {item.expandable && (
+                                {'expandable' in item && item.expandable && (
                                   <ChevronDown
                                     className={`h-4 w-4 transition-transform ${
                                       expandedItems[item.name] ? 'rotate-180' : ''
@@ -407,9 +408,9 @@ export function DashboardLayout({
                           </a>
                           
                           {/* Subitems */}
-                          {!sidebarCollapsed && item.subitems && expandedItems[item.name] && (
+                          {!sidebarCollapsed && 'subitems' in item && item.subitems && expandedItems[item.name] && (
                             <div className="ml-12 mt-1 space-y-1">
-                              {item.subitems.map((subitem) => (
+                              {(item as any).subitems.map((subitem: any) => (
                                 <a
                                   key={subitem.name}
                                   href={subitem.href}

@@ -78,6 +78,89 @@ interface PlaceholderProps {
 }
 
 export function DataPlaceholder({
+  type = 'empty',
+  title,
+  description,
+  action,
+  className,
+  size = 'md'
+}: DataPlaceholderProps) {
+  const getIcon = () => {
+    switch (type) {
+      case 'loading':
+        return <RefreshCw className="h-12 w-12 animate-spin" />
+      case 'error':
+        return <AlertCircle className="h-12 w-12" />
+      case 'no-connection':
+        return <Wifi className="h-12 w-12" />
+      default:
+        return <PackageOpen className="h-12 w-12" />
+    }
+  }
+
+  const getTitle = () => {
+    if (title) return title
+    switch (type) {
+      case 'loading':
+        return 'Loading...'
+      case 'error':
+        return 'Something went wrong'
+      case 'no-connection':
+        return 'No connection'
+      default:
+        return 'No data available'
+    }
+  }
+
+  const getDescription = () => {
+    if (description) return description
+    switch (type) {
+      case 'loading':
+        return 'Please wait while we load your data'
+      case 'error':
+        return 'We encountered an error while loading your data'
+      case 'no-connection':
+        return 'Please check your internet connection'
+      default:
+        return 'Connect data sources to see information here'
+    }
+  }
+
+  const sizeClasses = {
+    sm: 'p-4',
+    md: 'p-6',
+    lg: 'p-8'
+  }
+
+  return (
+    <div 
+      className={cn(
+        "flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-lg text-center",
+        sizeClasses[size],
+        className
+      )}
+    >
+      <div className="text-gray-400 mb-3">
+        {getIcon()}
+      </div>
+      <h4 className="text-gray-700 font-medium mb-1">{getTitle()}</h4>
+      <p className="text-gray-500 text-sm max-w-md">{getDescription()}</p>
+      
+      {action && (
+        <Button
+          onClick={action.onClick}
+          className="mt-4"
+          variant="outline"
+        >
+          {action.label}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+// Legacy placeholder component for backward compatibility
+export function Placeholder({
   height = 300,
   className,
   message = "No data available",
@@ -170,7 +253,7 @@ export function ChartPlaceholder({
         </div>
       </div>
       <div className="p-4">
-        <DataPlaceholder
+        <Placeholder
           height={height}
           icon={getIcon()}
           message={`${chartType.charAt(0).toUpperCase() + chartType.slice(1)} chart data unavailable`}
@@ -209,7 +292,7 @@ export function TablePlaceholder({
         </div>
       </div>
       <div className="p-4">
-        <DataPlaceholder
+        <Placeholder
           height={height}
           icon={<Table className="h-12 w-12" />}
           message="Table data unavailable"
