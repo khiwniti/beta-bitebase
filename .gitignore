@@ -85,10 +85,6 @@ public
 tmp/
 temp/
 
-# Tempo files
-**/tempobook/dynamic/
-**/tempobook/storyboards/
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
